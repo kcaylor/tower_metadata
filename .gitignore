@@ -1,0 +1,76 @@
+venv
+.pyc
+.env*
+.env_dev_local
+.env_dev_heroku
+.env_prod_heroku
+
+# Utility scripts for Kelly (and Gist):
+config.codekit
+
+Procfile.local
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+.pystartup
+env/
+bin/
+build/
+develop-eggs/
+dist/
+src/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+include/
+tests/
+cover/
+share/
+man/
+tmp/
+bower_components/
+app/static/xlsx/*.xlsx
+
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Rope
+.ropeproject
+
+# Django stuff:
+*.log
+*.pot
+
+# Sphinx documentation
+docs/_build/
