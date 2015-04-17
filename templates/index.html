@@ -7,6 +7,15 @@
 <div class="jumbotron">
   <h1>Hello</h1>
   <p>Welcome to the Mpala Tower Metadata and Download Page.</p>
+  {{ metadata }}
+  {% for file in metadata.files %}
+    <h2>file.filename</h2>
+    {% for variable in filename.variables %}
+     <h3> {{ variable.name }} </h3>
+     <h3> {{ variable.flag }} </h3>
+    {% endfor %}
+  {% endfor %}
+
 </div>
 
 {% endblock %}

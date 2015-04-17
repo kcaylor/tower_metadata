@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask import render_template
 # from flask.ext.mongoengine import MongoEngine
 # from mongoengine import connect
 from pymongo import MongoClient
@@ -39,15 +40,24 @@ config[config_name].init_app(app)
 bootstrap.init_app(app)
 moment.init_app(app)
 
+
 # Make the mongodb uri and establish a connection to the database:
 db_uri = create_db_uri(app.config)
 client = MongoClient(db_uri)
 db = client.mpala_tower_metadata
 Metadata = db.metadata
 
+
 # attach routes and custom error pages here
-from main import main as main_blueprint
-app.register_blueprint(main_blueprint)
+# from main import main as main_blueprint
+# app.register_blueprint(main_blueprint)
+@app.route('/')
+def index():
+    metadata = Metadata.find_one()
+    return render_template(
+        'index.html',
+        metadata=metadata)
+
 
 # Start up the app
 port = int(os.getenv('PORT', 5000))

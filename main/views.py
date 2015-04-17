@@ -1,10 +1,14 @@
 from flask import render_template
 from . import main
+from run import Metadata
 
 
 @main.route('/')
 def index():
-    return render_template('index.html')
+    metadata = Metadata.find_one()
+    return render_template(
+        'index.html',
+        metadata=metadata)
 
 
 @main.route('/this_week')
