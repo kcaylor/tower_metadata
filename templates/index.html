@@ -6,16 +6,26 @@
 
 <div class="jumbotron">
   <h1>Hello</h1>
-  <p>Welcome to the Mpala Tower Metadata and Download Page.</p>
-  {{ metadata }}
-  {% for file in metadata.files %}
-    <h2>file.filename</h2>
-    {% for variable in filename.variables %}
-     <h3> {{ variable.name }} </h3>
-     <h3> {{ variable.flag }} </h3>
-    {% endfor %}
-  {% endfor %}
-
+  <h2>Welcome to the Mpala Tower Metadata and Download Page.</h2>
+  <p>Our recent metadata is from {{ moment(metadata.date).format('dddd, MMMM Do YYYY') }}, {{ moment(metadata.date).fromNow(refresh=True) }}</p>
 </div>
+{% for file in metadata.files %}
+<div class="file">
+  <h2>  {{ file.filename }} </h2>
+    <div class="variables">
+    <h3>File Variables</h3>
+        <ul>
+        {% for variable in file.variables %}
+        <div class="variable">
+            <li> {{ variable.var }}: {{ variable.flag}} </li>
+        </div>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endfor %}
+
+<h4>All metadata</h4>
+  {{ metadata }}
 
 {% endblock %}
