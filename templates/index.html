@@ -17,7 +17,19 @@
         <ul>
         {% for variable in file.variables %}
         <div class="variable">
-            <li> {{ variable.var }}: {{ variable.flag}} </li>
+            <li> <strong>{{ variable.var }}</strong>
+            {% if variable.flag is defined %}
+                ({{ variable.flag}})
+            {% endif %}
+            </li>
+            {% if variable.count is defined %}
+            {% set pct = ((variable.count|float/(60*60*24/file.frequency))*100)|int %}
+            <span>Fraction of Available Data:</span>
+            <div class="progress">
+                 <div class="progress-bar" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100" style="width: {{pct}}%">{{ pct }}
+                </div>
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
         </ul>
