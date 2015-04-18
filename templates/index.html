@@ -6,8 +6,8 @@
 
 <div class="jumbotron">
   <h1>Hello</h1>
-  <h2>Welcome to the Mpala Tower Metadata and Download Page.</h2>
-  <p>Our recent metadata is from {{ moment(metadata.date).format('dddd, MMMM Do YYYY') }}, {{ moment(metadata.date).fromNow(refresh=True) }}</p>
+  <h2>Welcome to the Mpala Tower Metadata and Data Download Page.</h2>
+  <p>Our most recent metadata is from {{ moment(metadata.date).format('dddd, MMMM Do YYYY') }}, {{ moment(metadata.date).fromNow(refresh=True) }}</p>
 </div>
 {% for file in metadata.files %}
 <div class="file">
