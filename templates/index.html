@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 
+{% block head %}
+    {{ super() }}
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-progressbar-3.2.0.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-progressbar.min.js"></script>
+    <script src="/static/js/main.js"></script>
+{% endblock %}
+
 {% block title %} Mpala Tower Metadata and Download{% endblock %}
 
 {% block page_content %}
@@ -12,21 +25,22 @@
 {% for file in metadata.files %}
 <div class="file">
   <h2>  {{ file.filename }} </h2>
+
     <div class="variables">
     <h3>File Variables</h3>
         <ul>
         {% for variable in file.variables %}
         <div class="variable">
-            <li> <strong>{{ variable.var }}</strong>
-            {% if variable.flag is defined %}
-                ({{ variable.flag}})
+            <li> <strong>{{ variable.var|replace("_", " ") }}</strong>
+            {% if variable.flags is defined %}
+                ({{ variable.flags}})
             {% endif %}
             </li>
             {% if variable.count is defined %}
             {% set pct = ((variable.count|float/(60*60*24/file.frequency))*100)|int %}
             <span>Fraction of Available Data:</span>
             <div class="progress">
-                 <div class="progress-bar" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100" style="width: {{pct}}%">{{ pct }}
+                 <div class="progress-bar progress-bar-{{ label_pct(pct) }}" role="progressbar" data-transitiongoal="{{ pct }}">{{ pct }}
                 </div>
             </div>
             {% endif %}
