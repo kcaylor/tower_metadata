@@ -19,7 +19,7 @@ class Variable(db.EmbeddedDocument):
     comment = db.StringField()
 
     @staticmethod
-    def generate_fake(n=5):
+    def generate_fake():
         from random import choice, randint, random
         from faker import Faker
         fake = Faker()
