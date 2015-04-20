@@ -4,7 +4,7 @@ from . import db
 # Variables contained within Files:
 class Variable(db.EmbeddedDocument):
 
-    flags = db.ListField(db.StringField)
+    flags = db.ListField(db.StringField())
     name = db.StringField(db_field='var')
     units = db.StringField()
     count = db.IntField()
@@ -18,6 +18,30 @@ class Variable(db.EmbeddedDocument):
     coordinates = db.StringField()
     comment = db.StringField()
 
+    @staticmethod
+    def generate_fake(n=5):
+        from random import choice, randint, random
+        from faker import Faker
+        fake = Faker()
+        vals = [random() * 100 for i in [1, 2, 3, 4, 5, 6, 7]]
+        vals.sort()
+        this_variable = Variable(
+            flags=fake.words(5),
+            name=fake.name(),
+            units=fake.word(),
+            count=randint(1, 150),
+            avg_val=sum(vals) / len(vals),
+            std_val=choice(vals),
+            min_val=min(vals),
+            max_val=max(vals),
+            p25th=vals[1],
+            p75th=vals[-2],
+            content_type=fake.words(2),
+            coordinates=fake.words(3),
+            comment=fake.sentence()
+        )
+        return this_variable
+
 
 # Files contained within Metadata:
 class File(db.EmbeddedDocument):
@@ -30,16 +54,23 @@ class File(db.EmbeddedDocument):
     # The File object contains a list of Variables:
     variables = db.EmbeddedDocumentListField(Variable)
 
+    @staticmethod
+    def generate_fake():
+        from random import choice
+        from faker import Faker
+        fake = Faker()
+        this_file = File(
+            source=fake.word(),
+            instrument=fake.word(),
+            filename=fake.word(),
+            frequency=choice([.1, 60, 600, 1800]),
+            variables=[Variable.generate_fake() for i in range(1, 10)]
+        )
+        return this_file
+
 
 # The Metadata object
 class Metadata(db.Document):
-
-    def __init__(self, netcdf=None):
-        if netcdf is not None:
-            # Parse the netcdf and initialize the metadata object
-            print "Parsing the netcdf file to initialize Metadata"
-        else:
-            pass
 
     license = db.StringField()
     title = db.StringField()
@@ -70,5 +101,33 @@ class Metadata(db.Document):
         ]
     }
 
-    def create_fake_metadata(*args, **kwargs):
-        raise NotImplementedError
+    def parse_netcdf(self, netcdf=None):
+        if netcdf is not None:
+            # Parse the netcdf and initialize the metadata object
+            print "Parsing the netcdf file to initialize Metadata"
+        else:
+            pass
+
+    @staticmethod
+    def generate_fake():
+        from random import choice, randint
+        from faker import Faker
+        fake = Faker()
+        this_metadata = Metadata(
+            license=fake.word(),
+            title=fake.sentence(),
+            creator=fake.name(),
+            creator_email=fake.email(),
+            institution=fake.company(),
+            aknowledgements=fake.sentence(),
+            feature_type=fake.word(),
+            year=fake.year(),
+            month=fake.month(),
+            doy=randint(1, 365),
+            date=fake.date_time_this_month(),
+            summary=fake.sentence(),
+            conventions=fake.word(),
+            naming_authority=fake.company(),
+            files=[File.generate_fake() for i in range(1, 5)]
+        )
+        return this_metadata
