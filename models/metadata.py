@@ -23,7 +23,7 @@ class Variable(db.EmbeddedDocument):
         from random import choice, randint, random
         from faker import Faker
         fake = Faker()
-        vals = [random() * 100 for i in [1, 2, 3, 4, 5, 6, 7]]
+        vals = [random() * 100 for i in range(1, 7)]
         vals.sort()
         this_variable = Variable(
             flags=fake.words(5),
