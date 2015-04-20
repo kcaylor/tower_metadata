@@ -34,6 +34,13 @@ class File(db.EmbeddedDocument):
 # The Metadata object
 class Metadata(db.Document):
 
+    def __init__(self, netcdf=None):
+        if netcdf is not None:
+            # Parse the netcdf and initialize the metadata object
+            print "Parsing the netcdf file to initialize Metadata"
+        else:
+            pass
+
     license = db.StringField()
     title = db.StringField()
     creator = db.StringField(db_field='creator_name', default='Kelly Caylor')
@@ -62,3 +69,6 @@ class Metadata(db.Document):
             'doy',
         ]
     }
+
+    def create_fake_metadata(*args, **kwargs):
+        raise NotImplementedError
