@@ -5,13 +5,26 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.environ.get('APP_SECRET')
+    ROOT_DIR = os.environ.get('ROOT_DIR')
 
     @staticmethod
     def init_app(app):
         pass
 
 
+class TestingConfig(Config):
+    TESTING = True
+    MONGODB_SETTINGS = {
+        "DB": 'testing',
+        "USERNAME": '',
+        "PASSWORD": '',
+        "HOST": 'localhost',
+        "PORT": 27017
+    }
+
+
 class DevelopmentConfig(Config):
+    ROOT_DIR = os.environ.get('ROOT_DIR')
     DEBUG = True
     # MONGODB_DB = os.environ.get('MONGODB_DEV_DATABASE')
     # MONGODB_USERNAME = os.environ.get('MONGODB_DEV_USER')
@@ -28,5 +41,6 @@ class DevelopmentConfig(Config):
 
 config = {
     'development': DevelopmentConfig,
-    'default': DevelopmentConfig
+    'default': DevelopmentConfig,
+    'testing': TestingConfig
 }
