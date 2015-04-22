@@ -2,9 +2,10 @@ from . import db
 
 
 # Variables contained within Files:
-class Variable(db.EmbeddedDocument):
+class Variable(db.DynamicEmbeddedDocument):
 
     flags = db.ListField(db.StringField())
+    timestep_count = db.IntField()
     name = db.StringField(db_field='var')
     units = db.StringField()
     count = db.IntField()
@@ -36,15 +37,15 @@ class Variable(db.EmbeddedDocument):
             max_val=max(vals),
             p25th=vals[1],
             p75th=vals[-2],
-            content_type=fake.words(2),
-            coordinates=fake.words(3),
+            content_type=fake.word(),
+            coordinates=fake.word(),
             comment=fake.sentence()
         )
         return this_variable
 
 
 # Files contained within Metadata:
-class File(db.EmbeddedDocument):
+class File(db.DynamicEmbeddedDocument):
 
     source = db.StringField()
     instrument = db.StringField()
@@ -70,7 +71,7 @@ class File(db.EmbeddedDocument):
 
 
 # The Metadata object
-class Metadata(db.Document):
+class Metadata(db.DynamicDocument):
 
     license = db.StringField()
     title = db.StringField()

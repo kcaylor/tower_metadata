@@ -25,29 +25,7 @@
 {% for file in metadata.files %}
 <div class="file">
   <h2>  {{ file.filename }} </h2>
-
-    <div class="variables">
-    <h3>File Variables</h3>
-        <ul>
-        {% for variable in file.variables %}
-        <div class="variable">
-            <li> <strong>{{ variable.var|replace("_", " ") }}</strong>
-            {% if variable.flags is defined %}
-                ({{ variable.flags}})
-            {% endif %}
-            </li>
-            {% if variable.count is defined %}
-            {% set pct = ((variable.count|float/(60*60*24/file.frequency))*100)|int %}
-            <span>Fraction of Available Data:</span>
-            <div class="progress">
-                 <div class="progress-bar progress-bar-{{ label_pct(pct) }}" role="progressbar" data-transitiongoal="{{ pct }}">{{ pct }}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        {% endfor %}
-        </ul>
-    </div>
+    {% include 'variables_tiled.html' %}
 </div>
 {% endfor %}
 
