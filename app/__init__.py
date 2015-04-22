@@ -40,6 +40,19 @@ def create_app(config_name):
     @app.context_processor
     def helper_functions():
 
+        def sig_fig(x=None, n=None):
+            from math import floor, log10
+            if n is not None:
+                n = int(n)
+            if x is None:
+                return x
+            if x == 0:
+                return x
+            if n <= 0:
+                return x
+            else:
+                return round(x, -int(floor(log10(abs(x)))) + (n - 1))
+
         def label_pct(pct):
             if pct is None:
                 return 'danger'
@@ -50,7 +63,8 @@ def create_app(config_name):
             return 'warning'
 
         return dict(
-            label_pct=label_pct
+            label_pct=label_pct,
+            sig_fig=sig_fig
         )
 
     return app

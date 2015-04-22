@@ -2,7 +2,6 @@
 
 {% block head %}
     {{ super() }}
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet">
     <link href="/static/css/bootstrap-progressbar-3.2.0.min.css" rel="stylesheet">
     <link href="/static/css/chart.css" rel="stylesheet">
 {% endblock %}
@@ -12,7 +11,6 @@
     <script src="{{ url_for('bower.static', filename='jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ url_for('bower.static', filename='bootstrap-progressbar/bootstrap-progressbar.min.js') }}"></script>
     <script src="{{ url_for('bower.static', filename='bootstrap/js/tab.js') }}"></script>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="/static/js/main.js"></script>
 {% endblock %}
 
@@ -21,7 +19,6 @@
 {% block page_content %}
 
 <div class="jumbotron">
-  <h1>Hello</h1>
   <h2>Welcome to the Mpala Tower Metadata and Data Download Page.</h2>
   <p>Our most recent metadata is from {{ moment(metadata.date).format('dddd, MMMM Do YYYY') }}, {{ moment(metadata.date).fromNow(refresh=True) }}</p>
 </div>
@@ -30,7 +27,7 @@
   <!-- Nav tabs -->
   <ul class="nav nav-pills" role="tablist" id="datafiletabs">
     {% for file in metadata.files %}
-      <li role="presentation" class="inactive"><a href="#{{file.datafile}}" aria-controls="home" role="tab" data-toggle="tab">{{file.datafile}}</a>
+      <li role="presentation" class="inactive"><a href="#{{file.datafile}}" aria-controls="home" role="tab" data-toggle="tab">{{file.datafile|title}}</a>
       </li>
     {% endfor %} 
   </ul>
