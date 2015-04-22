@@ -2,6 +2,19 @@ from __init__ import db
 from file import File
 
 
+def write_temp(client, file_location, this_file, f):
+    import os
+
+    os.mkdir('/temp/%s/' % this_file)  # this is probably not a good place to store them
+    temp_location = '/temp/%s/' % this_file + f
+    out = open(temp_location, 'wb')
+    with client.get_file(file_location) as f:
+        out.write(f.read())
+    out.close()
+    print(temp_location)
+    return temp_location
+
+
 # The Metadata object
 class Metadata(db.DynamicDocument):
 
@@ -124,37 +137,22 @@ class Metadata(db.DynamicDocument):
 
 
 class DropboxFiles(Metadata):
-    DROPBOX_APP_KEY = 'w60h88jagrapjkw'
-    DROPBOX_APP_SECRET = 'sxmj60mm1opfdcd'
-    access_token = 'JGWZ6z0FSMkAAAAAAAAAkSG2RYi1cuyerswzJm4iUAFGpiFZCo6ki8bxRLLGHEd9'
-    dropbox_dir = '/Kenyalab/Data/Tower/TowerData/raw_netCDF_output/'
 
     def __repr__(self):
         return '<Dropbox Metadata for doy: %d, year: %d>' \
             % (self.doy, self.year)
 
     @staticmethod
-    # this goes in with convert_to_sec
-    def write_temp(client, file_location, this_file, f):
-        from dropbox.client import DropboxClient
-        from posixpath import join
-        import os
-    
-        os.mkdir('/temp/%s/' % this_file)  # this is probably not a good place to store them
-        temp_location = '/temp/%s/' % this_file + f
-        out = open(temp_location, 'wb')
-        with client.get_file(file_location) as f:
-            out.write(f.read())
-        out.close()
-        print(temp_location)
-        return temp_location
-
-    @staticmethod
     def find_files(year=None, doy=None):
         from dropbox.client import DropboxClient
         from posixpath import join
         import os
-        
+
+        DROPBOX_APP_KEY = os.environ.get('DROPBOX_APP_KEY')
+        DROPBOX_APP_SECRET = os.environ.get('DROPBOX_APP_SECRET')
+        access_token = os.environ.get('access_token')
+        dropbox_dir = os.environ.get('dropbox_dir')
+
         client = DropboxClient(access_token)
 
         files = []  # Initialize an empty array
@@ -163,7 +161,7 @@ class DropboxFiles(Metadata):
             file_location = join(dropbox_dir, this_file)
             listdict = []
             # listdict has a lot of good metadata in it if we ever decide to use it
-            listdict = client.search(file_location, f, file_limit = 1)
+            listdict = client.search(file_location, f, file_limit=1)
             if listdict != []:
                 temp_location = write_temp(client, listdict[0]['path'], this_file, f)
                 this_file = File(
