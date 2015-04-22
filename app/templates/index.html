@@ -22,14 +22,24 @@
   <h2>Welcome to the Mpala Tower Metadata and Data Download Page.</h2>
   <p>Our most recent metadata is from {{ moment(metadata.date).format('dddd, MMMM Do YYYY') }}, {{ moment(metadata.date).fromNow(refresh=True) }}</p>
 </div>
-{% for file in metadata.files %}
-<div class="file">
-  <h2>  {{ file.filename }} </h2>
-    {% include 'variables_tiled.html' %}
-</div>
-{% endfor %}
 
-<h4>All metadata</h4>
-  {{ metadata }}
+<div role="tabpanel">
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist" id="datafiletabs">
+    {% for file in metadata.files %}
+      <li role="presentation" class="inactive"><a href="#{{file.datafile}}" aria-controls="home" role="tab" data-toggle="tab">{{file.datafile}}</a>
+      </li>
+    {% endfor %} 
+  </ul>
+</div>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  {% for file in metadata.files %}
+    <div role="tabpanel" class="tab-pane active" id="{{file.datafile}}">
+      {% include 'variables_tiled.html' %}
+    </div>
+  {% endfor %}
+</div>
 
 {% endblock %}
