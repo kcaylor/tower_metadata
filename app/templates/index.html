@@ -4,12 +4,15 @@
     {{ super() }}
     <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet">
     <link href="/static/css/bootstrap-progressbar-3.2.0.min.css" rel="stylesheet">
+    <link href="/static/css/chart.css" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
     {{ super() }}
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="{{ url_for('bower.static', filename='jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ url_for('bower.static', filename='bootstrap-progressbar/bootstrap-progressbar.min.js') }}"></script>
+    <script src="{{ url_for('bower.static', filename='bootstrap/js/tab.js') }}"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="/static/js/main.js"></script>
 {% endblock %}
 
@@ -25,7 +28,7 @@
 
 <div role="tabpanel">
   <!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist" id="datafiletabs">
+  <ul class="nav nav-pills" role="tablist" id="datafiletabs">
     {% for file in metadata.files %}
       <li role="presentation" class="inactive"><a href="#{{file.datafile}}" aria-controls="home" role="tab" data-toggle="tab">{{file.datafile}}</a>
       </li>
@@ -34,9 +37,9 @@
 </div>
 
 <!-- Tab panes -->
-<div class="tab-content">
+<div class="tab-content" id="datafiletabcontent">
   {% for file in metadata.files %}
-    <div role="tabpanel" class="tab-pane active" id="{{file.datafile}}">
+    <div role="tabpanel" class="tab-pane inactive" id="{{file.datafile}}">
       {% include 'variables_tiled.html' %}
     </div>
   {% endfor %}
