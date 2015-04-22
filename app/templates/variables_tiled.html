@@ -1,0 +1,22 @@
+<div class="container">
+{% for variable in file.variables %}
+    {%if loop.index0%4 == 0 %}
+        {%if loop.index0==0 %}
+           <div class="row">
+        {% else %}
+            </div><div class="row">
+        {% endif %}
+    {% endif %}
+    <div class="col-sm-3">    
+        <h4>{{ variable.name }}</h4>
+        <br>
+        <small>
+            ({{ variable.units }})
+        </small>
+    </div>
+    {%if loop.last == True %}
+        </div>
+    {% endif %}
+{% endfor %}
+</div>
+
