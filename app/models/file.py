@@ -53,8 +53,10 @@ class File(db.DynamicEmbeddedDocument):
         # Program locations should always be taken from dropbox.
         # So we need to edit this.
         from posixpath import join
+        import os
+        root_dir = os.environ.get('ROOT_DIR')
         program = self.source.split('CPU:')[1].split(',')[0]
-        return join(self.input_dir, 'programs', program)
+        return join(root_dir, 'programs', program)
 
     @staticmethod
     def get_programmed_frequency(program=None, datafile=None):
@@ -63,7 +65,7 @@ class File(db.DynamicEmbeddedDocument):
         except:
             frequency_flag = 'program: %s not found' % program
             frequency = float('nan')
-            timestep_count = float('nan')
+            timestep_count = int(0)
             return [frequency, frequency_flag, timestep_count]
         lines = prog.readlines()
         i = 0
@@ -96,7 +98,7 @@ class File(db.DynamicEmbeddedDocument):
         if interval is None:
             frequency_flag = 'could not find interval in %s' % program
             frequency = float('nan')
-            timestep_count = float('nan')
+            timestep_count = int(0)
             return [frequency, frequency_flag, timestep_count]
         try:
             num = int(interval)
@@ -131,7 +133,7 @@ class File(db.DynamicEmbeddedDocument):
         return ds, df_summ
 
     def parse(self):
-        ds, df_summ = self.process_netcdf(netcdf=self.filename)
+        ds, df_summ = self.process_netcdf(netcdf=self.file_location)
         self.source = ds.attrs['source']
         self.instrument = ds.attrs['instrument']
         [

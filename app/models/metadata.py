@@ -24,6 +24,7 @@ class Metadata(db.DynamicDocument):
     files = db.EmbeddedDocumentListField(File)
 
     meta = {
+        'allow_inheritance': True,
         'collection': 'metadata',
         'ordering': ['-date'],
         'index_background': True,
@@ -74,13 +75,14 @@ class Metadata(db.DynamicDocument):
         self.conventions = ds.attrs['Conventions']
         self.naming_authority = ds.attrs['naming_authority']
         if self.date is None:
-            import datetime
+            from datetime import datetime
             self.date = datetime.fromordinal(
                 datetime.toordinal(datetime(
                     year=self.year, month=1, day=1)
                 ) + self.doy - 1
             )
             self.month = self.date.month
+        self.parse_files()
         self.save()
         return self
 
@@ -104,8 +106,8 @@ class Metadata(db.DynamicDocument):
                 institution=fake.company(),
                 aknowledgements=fake.sentence(),
                 feature_type=fake.word(),
-                year=fake.year(),
-                month=fake.month(),
+                year=int(fake.year()),
+                month=int(fake.month()),
                 doy=randint(1, 365),
                 date=fake.date_time_this_month(),
                 summary=fake.sentence(),
@@ -115,7 +117,10 @@ class Metadata(db.DynamicDocument):
             )
             fake_metadata.append(this_metadata)
             this_metadata.save()
-        return fake_metadata
+        if len(fake_metadata) == 1:
+            return fake_metadata[0]
+        else:
+            return fake_metadata
 
 
 class DropboxMetadata(Metadata):
@@ -129,4 +134,3 @@ class DropboxMetadata(Metadata):
         files = []
         # Do the dropbox stuff
         return files
-

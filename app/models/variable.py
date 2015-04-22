@@ -16,12 +16,12 @@ class Variable(db.DynamicEmbeddedDocument):
     p25th = db.FloatField(db_field='25%')
     p75th = db.FloatField(db_field='75%')
     content_type = db.StringField(db_field='content_coverage_type')
-    coordinates = db.StringField()
     comment = db.StringField()
 
     def clean(self):
         # Get the flag_by_units dict.
         # check status of data and raise flags
+        print "Setting QA/QC flags for %s" % self.name
         flags = []
 
         if self.expected_count * 11. / 12. < self.count < self.expected_count:
@@ -64,7 +64,6 @@ class Variable(db.DynamicEmbeddedDocument):
                 max_val=df['max'],
                 units=ds.attrs['units'],
                 comment=ds.attrs['comment'],
-                coordinates=ds.attrs['coordinates'],
                 content_type=ds.attrs['content_coverage_type'],
             )
         else:
@@ -73,7 +72,6 @@ class Variable(db.DynamicEmbeddedDocument):
                 expected_count=ts,
                 count=df['count']
             )
-        this_var.generate_flags()
         return this_var
 
     @staticmethod
