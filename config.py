@@ -11,15 +11,28 @@ class Config:
     def init_app(app):
         pass
 
+    def mongo_url(self):
+
+        if self.MONGODB_SETTINGS['username'] is '':
+            return 'mongodb://' + self.MONGODB_SETTINGS['host'] + \
+                ':' + str(self.MONGODB_SETTINGS['port']) + \
+                '/' + self.MONGODB_SETTINGS['db']
+        else:
+            return 'mongodb://' + self.MONGODB_SETTINGS['username'] + \
+                ':' + self.MONGODB_SETTINGS['password'] + \
+                '@' + self.MONGODB_SETTINGS['host'] + \
+                ':' + str(self.MONGODB_SETTINGS['port']) + \
+                '/' + self.MONGODB_SETTINGS['db']
+
 
 class TestingConfig(Config):
     TESTING = True
     MONGODB_SETTINGS = {
-        "DB": 'testing',
-        "USERNAME": '',
-        "PASSWORD": '',
-        "HOST": 'localhost',
-        "PORT": 27017
+        "db": 'testing',
+        "username": '',
+        "password": '',
+        "host": 'localhost',
+        "port": 27017
     }
 
 

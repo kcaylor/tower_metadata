@@ -84,30 +84,34 @@ class Metadata(db.DynamicDocument):
         return files
 
     def generate_metadata(self):
-        this_netcdf = self.files[0].file_location
-        ds, df_summ = self.files[0].process_netcdf(netcdf=this_netcdf)
-        self.license = ds.attrs['license']
-        self.title = ds.attrs['title']
-        self.creator = ds.attrs['creator_name']
-        self.creator_email = ds.attrs['creator_email']
-        self.institution = ds.attrs['institution']
-        self.aknowledgements = ds.attrs['acknowledgement']
-        self.feature_type = ds.attrs['featureType']
-        self.summary = ds.attrs['summary']
-        self.conventions = ds.attrs['Conventions']
-        self.naming_authority = ds.attrs['naming_authority']
-        if self.date is None:
-            from datetime import datetime
-            self.date = datetime.fromordinal(
-                datetime.toordinal(datetime(
-                    year=self.year, month=1, day=1)
-                ) + self.doy - 1
-            )
-            self.month = self.date.month
-            self.day = self.date.day
-        self.parse_files()
-        self.save()
-        return self
+        if len(self.files) > 0:
+            this_netcdf = self.files[0].file_location
+            ds, df_summ = self.files[0].process_netcdf(netcdf=this_netcdf)
+            self.license = ds.attrs['license']
+            self.title = ds.attrs['title']
+            self.creator = ds.attrs['creator_name']
+            self.creator_email = ds.attrs['creator_email']
+            self.institution = ds.attrs['institution']
+            self.aknowledgements = ds.attrs['acknowledgement']
+            self.feature_type = ds.attrs['featureType']
+            self.summary = ds.attrs['summary']
+            self.conventions = ds.attrs['Conventions']
+            self.naming_authority = ds.attrs['naming_authority']
+            if self.date is None:
+                from datetime import datetime
+                self.date = datetime.fromordinal(
+                    datetime.toordinal(datetime(
+                        year=self.year, month=1, day=1)
+                    ) + self.doy - 1
+                )
+                self.month = self.date.month
+                self.day = self.date.day
+            self.parse_files()
+            self.save()
+            return self
+        else:
+            return "No files found for %d, day of year %d" \
+                % (self.year, self.doy)
 
     def parse_files(self):
         for f in self.files:
