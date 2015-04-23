@@ -27,14 +27,48 @@ def create_app(config_name):
     db.init_app(app)
     bower.init_app(app)
 
+    from app.models.metadata import Metadata
+
     # Set up the application routes:
     @app.route('/')
     def index():
-        from app.models.metadata import Metadata
         metadata = Metadata.objects().first()
         return render_template(
             'index.html',
             metadata=metadata)
+
+    @app.route('/<int:year>/<int:doy>')
+    def file_year_doy(year=2015, doy=1):
+        metadata = Metadata.objects(
+            year=year,
+            doy=doy).first()
+        if metadata is None:
+            return render_template('404.html')
+        else:
+            return render_template(
+                'file.html',
+                metadata=metadata)
+
+    @app.route('/<int:year>/<int:month>/<int:day>')
+    def file_year_month_day(year=2015, month=1, day=20):
+        from datetime import datetime
+        date = datetime(year=year, month=month, day=day)
+        metadata = Metadata.objects(
+            date=date).first()
+        if metadata is None:
+            return render_template('404.html')
+        else:
+            return render_template(
+                'file.html',
+                metadata=metadata)
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('500.html'), 500
 
     # Put any template helper functions in here:
     @app.context_processor

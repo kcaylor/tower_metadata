@@ -12,10 +12,10 @@
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h4 class="panel-title">{{ variable.name|replace("_"," ")|title }}
-                    <small>({{ variable.units|replace("Deg ","&#176;")|replace("degC","&#176;C")|replace("meter^2","m<sup>2</sup>")|replace("m^3","m<sup>3</sup>")|replace("m^2","m<sup>2</sup>")|safe }})</small>
-                    <small><span class="badge success">
+                    ({{ variable.units|replace("Deg ","&#176;")|replace("degC","&#176;C")|replace("meter^2","m<sup>2</sup>")|replace("m^3","m<sup>3</sup>")|replace("m^2","m<sup>2</sup>")|safe }})
+                    &nbsp;<span class="badge">
                             {{ variable.count }}
-                    </span></small>
+                    </span>
                                  
                 </h4>
             </div>
