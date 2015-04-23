@@ -12,7 +12,7 @@ if os.path.exists('.env'):
 
 # Import the ORM for the metadata
 from app.models import db
-from app.models.metadata import Metadata
+from app.models.metadata import Metadata, DropboxFiles
 from app.models.variable import Variable
 from app.models.file import File
 from app import create_app
@@ -29,6 +29,7 @@ def make_shell_context():
         app=app,
         db=db,
         Metadata=Metadata,
+        DropboxFiles=DropboxFiles,
         Flie=File,
         Variable=Variable
     )

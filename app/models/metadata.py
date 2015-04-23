@@ -1,12 +1,19 @@
-from __init__ import db
-from file import File
+from . import db
+import errno
+from .file import File
 
 
 def write_temp(client, file_location, this_file, f):
     import os
-
-    os.mkdir('/temp/%s/' % this_file)  # this is probably not a good place to store them
-    temp_location = '/temp/%s/' % this_file + f
+    # this is probably not a good place to store them
+    # the actual code
+    path = '/tmp/%s/' % this_file
+    try:
+        os.mkdir(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+    temp_location = '/tmp/%s/' % this_file + f
     out = open(temp_location, 'wb')
     with client.get_file(file_location) as f:
         out.write(f.read())
@@ -149,8 +156,6 @@ class DropboxFiles(Metadata):
         from posixpath import join
         import os
 
-        DROPBOX_APP_KEY = os.environ.get('DROPBOX_APP_KEY')
-        DROPBOX_APP_SECRET = os.environ.get('DROPBOX_APP_SECRET')
         access_token = os.environ.get('access_token')
         dropbox_dir = os.environ.get('dropbox_dir')
 
@@ -161,15 +166,20 @@ class DropboxFiles(Metadata):
         for this_file in File.DATA_FILES:
             file_location = join(dropbox_dir, this_file)
             listdict = []
-            # listdict has a lot of good metadata in it if we ever decide to use it
+            # listdict has a good metadata in it if we ever decide to use it
             listdict = client.search(file_location, f, file_limit=1)
             if listdict != []:
-                temp_location = write_temp(client, listdict[0]['path'], this_file, f)
+                temp_location = write_temp(
+                    client,
+                    listdict[0]['path'],
+                    this_file,
+                    f
+                )
                 this_file = File(
-                        filename=f,
-                        datafile=this_file,
-                        file_location=temp_location,
-                    )
+                    filename=f,
+                    datafile=this_file,
+                    file_location=temp_location,
+                )
                 files.append(this_file)
             else:
                 continue

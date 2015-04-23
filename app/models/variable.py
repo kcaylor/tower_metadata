@@ -1,4 +1,4 @@
-from __init__ import db, flag_by_units
+from . import db, flag_by_units
 
 
 # Variables contained within Files:
