@@ -49,19 +49,38 @@ class File(db.DynamicEmbeddedDocument):
     # The File object contains a list of Variables:
     variables = db.EmbeddedDocumentListField(Variable)
 
-    def get_program_location(self):
+    def get_program_location_local(self):
         # Program locations should always be taken from dropbox.
         # So we need to edit this.
         from posixpath import join
         import os
         root_dir = os.environ.get('ROOT_DIR')
         program = self.source.split('CPU:')[1].split(',')[0]
-        return join(root_dir, 'programs', program)
+        prog_path = join(root_dir, 'programs', program)
+        return program, prog_path
 
+    def get_program_location_dropbox(self):
+        from dropbox.client import DropboxClient
+        from posixpath import join
+        import os
+
+        access_token = os.environ.get('access_token')
+        dropbox_dir = os.environ.get('dropbox_dir')
+        
+        client = DropboxClient(access_token)
+
+        program = self.source.split('CPU:')[1].split(',')[0]
+        prog_obj = client.get_file(join(dropbox_dir, 'programs', program))
+        return program, prog_obj
+ 
     @staticmethod
-    def get_programmed_frequency(program=None, datafile=None):
+    def get_programmed_frequency(program=None, datafile=None,
+                                 prog_obj=None, prog_path=None):
         try:
-            prog = open(program)
+            if prog_path is not None:
+                prog = open(prog_path)
+            elif prog_obj is not None:
+                prog = open(prog_obj)
         except:
             frequency_flag = 'program: %s not found' % program
             frequency = float('nan')
@@ -75,20 +94,21 @@ class File(db.DynamicEmbeddedDocument):
         di = 'DataInterval'
         ct = 'CallTable'
         for i in range(len(lines)):
-            if lines[i].split()[0:] == [dt, datafile]:
+            line = lines[i].lstrip()
+            if line.startswith(dt) and datafile in line:
                 k = i
-            if lines[i].split()[0:1] == di and i <= (k + 2):
-                interval = lines[i].split(',')[1]
-                units = lines[i].split(',')[2]
+            if line.startswith(di) and i <= (k + 2):
+                interval = line.split(',')[1]
+                units = line.split(',')[2]
             i += 1
         if interval is None:
             i = 0
             for i in range(len(lines)):
-                if lines[i].split()[0:1] == 'Scan':
-                    interval = lines[i].split('(')[1].split(',')[0]
-                    units = lines[i].split(',')[1]
-                if lines[i].split()[0:2] == [ct, datafile] \
-                        and i <= (k + 7):
+                line = lines[i].lstrip()
+                if line.startswith('Scan'):
+                    interval = line.split('(')[1].split(',')[0]
+                    units = line.split(',')[1]
+                if line.startswith(ct) and datafile in line and i <= (k + 7):
                     interval = interval
                     units = units
                 else:
@@ -103,7 +123,8 @@ class File(db.DynamicEmbeddedDocument):
         try:
             num = int(interval)
         except:
-            for line in lines:
+            for l in lines:
+                line = l.lstrip()
                 if line.startswith('Const ' + interval):
                     a = line.split('=')[1]
                     b = a.split()[0]

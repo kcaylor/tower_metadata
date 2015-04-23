@@ -149,8 +149,6 @@ class DropboxFiles(Metadata):
         from posixpath import join
         import os
 
-        DROPBOX_APP_KEY = os.environ.get('DROPBOX_APP_KEY')
-        DROPBOX_APP_SECRET = os.environ.get('DROPBOX_APP_SECRET')
         access_token = os.environ.get('access_token')
         dropbox_dir = os.environ.get('dropbox_dir')
 
