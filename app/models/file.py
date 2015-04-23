@@ -1,5 +1,5 @@
-from . import db
-from .variable import Variable
+from __init__ import db
+from variable import Variable
 import xray
 
 
@@ -115,7 +115,8 @@ class File(db.DynamicEmbeddedDocument):
 
     @staticmethod
     def process_netcdf(netcdf=None):
-        from . import static_attrs
+        from __init__ import static_attrs
+
         ds = xray.Dataset()
         ds = xray.open_dataset(
             netcdf,
