@@ -14,10 +14,12 @@ def write_temp(client, file_location, this_file, f):
         if exc.errno == errno.EEXIST and os.path.isdir(path):
             pass
     temp_location = '/tmp/%s/' % this_file + f
-    out = open(temp_location, 'wb')
-    with client.get_file(file_location) as f:
-        out.write(f.read())
-    out.close()
+    # Check to see if the file is already there. It's faster.
+    if not os.path.isfile(temp_location):
+        out = open(temp_location, 'wb')
+        with client.get_file(file_location) as f:
+            out.write(f.read())
+        out.close()
     print(temp_location)
     return temp_location
 
