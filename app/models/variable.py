@@ -21,7 +21,6 @@ class Variable(db.DynamicEmbeddedDocument):
     def clean(self):
         # Get the flag_by_units dict.
         # check status of data and raise flags
-        print "Setting QA/QC flags for %s" % self.name
         flags = []
 
         if self.expected_count * 11. / 12. < self.count < self.expected_count:

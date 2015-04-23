@@ -8,4 +8,8 @@ $(document).ready(function () {
         use_percentage: true,
         display_text: 'fill'
         });
+    $('#datafiletabs a:first').tab('show');
+    $('#datafiletabs li:first').addClass('active');
+    $('#datafiletabcontent div:first').removeClass('inactive');
+    $('#datafiletabcontent div:first').addClass('active');
 });
