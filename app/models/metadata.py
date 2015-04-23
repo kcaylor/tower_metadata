@@ -95,6 +95,7 @@ class Metadata(db.DynamicDocument):
                 ) + self.doy - 1
             )
             self.month = self.date.month
+            self.day = self.date.day
         self.parse_files()
         self.save()
         return self
