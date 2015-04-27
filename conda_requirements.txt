@@ -3,7 +3,13 @@
 # platform: osx-64
 binstar=0.10.3=py27_0
 clyent=0.3.4=py27_0
+curl=7.38.0=0
+hdf5=1.8.14=0
+libnetcdf=4.3.2=1
+netcdf4=1.1.6=np19py27_0
+numpy=1.9.2=py27_0
 openssl=1.0.1k=1
+pandas=0.16.0=np19py27_1
 pip=6.1.1=py27_0
 python=2.7.9=1
 python-dateutil=2.4.2=py27_0
