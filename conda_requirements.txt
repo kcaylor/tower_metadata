@@ -1,7 +1,6 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: osx-64
-binstar=0.10.3=py27_0
 clyent=0.3.4=py27_0
 curl=7.38.0=0
 hdf5=1.8.14=0
