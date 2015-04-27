@@ -22,6 +22,8 @@ __pycache__/
 # Conda stuff
 conda-meta/
 ssl/
+.conda-requirements.txt
+.requirements.txt
 
 # Distribution / packaging
 .Python
