@@ -19,6 +19,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Conda stuff
+conda-meta/
+ssl/
+
 # Distribution / packaging
 .Python
 .pystartup
