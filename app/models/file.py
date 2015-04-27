@@ -117,14 +117,12 @@ class File(db.DynamicEmbeddedDocument):
             for i in range(len(lines)):
                 line = lines[i].lstrip()
                 if line.startswith('Scan'):
-                    interval = line.split('(')[1].split(',')[0]
-                    units = line.split(',')[1]
+                    interval_temp = line.split('(')[1].split(',')[0]
+                    units_temp = line.split(',')[1]
+                    k = i
                 if line.startswith(ct) and datafile in line and i <= (k + 7):
-                    interval = interval
-                    units = units
-                else:
-                    interval = None
-                    units = None
+                    interval = interval_temp
+                    units = units_temp
                 i += 1
         if interval is None:
             frequency_flag = 'could not find program interval'
@@ -141,7 +139,7 @@ class File(db.DynamicEmbeddedDocument):
                     b = a.split()[0]
                     num = int(b)
         frequency = convert_to_sec(num, units)
-        timestep_count = 24. * 60. * 60. / frequency
+        timestep_count = int(24. * 60. * 60. / frequency)
         frequency_flag = 'found frequency'
         return [frequency, frequency_flag, timestep_count]
 
