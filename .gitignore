@@ -7,6 +7,7 @@ venv
 
 # Utility scripts for Kelly (and Gist):
 config.codekit
+.codekit-cache
 
 Procfile.local
 .DS_Store
