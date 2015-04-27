@@ -32,7 +32,7 @@ class File(db.DynamicEmbeddedDocument):
     ]
 
     source = db.StringField()
-    instrument = db.StringField()
+    logger = db.StringField()
     datafile = db.StringField(
         choices=DATA_FILES
     )
@@ -57,7 +57,7 @@ class File(db.DynamicEmbeddedDocument):
         from posixpath import join
         import os
         root_dir = os.environ.get('ROOT_DIR')
-        program_name = self.source.split('CPU:')[1].split(',')[0]
+        program_name = self.program
         program_file = open(join(root_dir, 'programs', program_name))
         program_content = program_file.readlines()
         return program_name, program_content
@@ -81,7 +81,9 @@ class File(db.DynamicEmbeddedDocument):
             if self.source is None:
                 ds, df_summ = self.process_netcdf(netcdf=self.file_location)
                 self.source = ds.attrs['source']
-            self.program_name = self.source.split('CPU:')[1].split(',')[0]
+            if self.program_name is None:
+                ds, df_summ = self.process_netcdf(netcdf=self.file_location)
+                self.program_name = ds.attrs['program']
             self.program_location = join(
                 dropbox_dir,
                 'programs',
@@ -166,7 +168,8 @@ class File(db.DynamicEmbeddedDocument):
     def parse(self):
         ds, df_summ = self.process_netcdf(netcdf=self.file_location)
         self.source = ds.attrs['source']
-        self.instrument = ds.attrs['instrument']
+        self.program = ds.attrs['program']
+        self.logger = ds.attrs['logger']
         program_content = self.get_program()
         [
             self.frequency,
@@ -194,7 +197,7 @@ class File(db.DynamicEmbeddedDocument):
         fake = Faker()
         this_file = File(
             source=fake.word(),
-            instrument=fake.word(),
+            logger=fake.word(),
             filename=fake.word(),
             frequency=choice([.1, 60, 600, 1800]),
             variables=[Variable.generate_fake() for i in range(1, 10)]
