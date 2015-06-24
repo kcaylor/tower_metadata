@@ -32,7 +32,7 @@ class File(db.DynamicEmbeddedDocument):
     ]
 
     source = db.StringField()
-    instrument = db.StringField()
+    logger = db.StringField()
     datafile = db.StringField(
         choices=DATA_FILES
     )
@@ -57,7 +57,7 @@ class File(db.DynamicEmbeddedDocument):
         from posixpath import join
         import os
         root_dir = os.environ.get('ROOT_DIR')
-        program_name = self.source.split('CPU:')[1].split(',')[0]
+        program_name = self.program
         program_file = open(join(root_dir, 'programs', program_name))
         program_content = program_file.readlines()
         return program_name, program_content
@@ -75,18 +75,17 @@ class File(db.DynamicEmbeddedDocument):
 
         # If this is our first time with this file, set the program name and
         # location.
-        if self.program_name is None and self.program_location is None:
-            # Catch the case where we try to run this
-            # before setting self.source:
-            if self.source is None:
-                ds, df_summ = self.process_netcdf(netcdf=self.file_location)
-                self.source = ds.attrs['source']
-            self.program_name = self.source.split('CPU:')[1].split(',')[0]
-            self.program_location = join(
-                dropbox_dir,
-                'programs',
-                self.program_name
-            )
+        if self.program_name is None or self.program_location is None:
+            ds, df_summ = self.process_netcdf(netcdf=self.file_location)
+        if self.source is None:
+            self.source = ds.attrs['source']
+        if self.program_name is None:
+            self.program_name = ds.attrs['program']
+        self.program_location = join(
+            dropbox_dir,
+            'programs',
+            self.program_name
+        )
         # Retrieve the REST object from Dropbox
         prog_obj = client.get_file(self.program_location)
         # Put the program file contents into an array for parsing
@@ -166,7 +165,9 @@ class File(db.DynamicEmbeddedDocument):
     def parse(self):
         ds, df_summ = self.process_netcdf(netcdf=self.file_location)
         self.source = ds.attrs['source']
-        self.instrument = ds.attrs['instrument']
+        self.logger = ds.attrs['logger']
+        self.program = ds.attrs['program']
+        self.datafile = ds.attrs['datafile']
         program_content = self.get_program()
         [
             self.frequency,
@@ -194,7 +195,7 @@ class File(db.DynamicEmbeddedDocument):
         fake = Faker()
         this_file = File(
             source=fake.word(),
-            instrument=fake.word(),
+            logger=fake.word(),
             filename=fake.word(),
             frequency=choice([.1, 60, 600, 1800]),
             variables=[Variable.generate_fake() for i in range(1, 10)]

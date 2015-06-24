@@ -6,6 +6,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     SECRET_KEY = os.environ.get('APP_SECRET')
     ROOT_DIR = os.environ.get('ROOT_DIR')
+    SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
 
     @staticmethod
     def init_app(app):

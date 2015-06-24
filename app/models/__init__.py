@@ -2,7 +2,7 @@ from flask.ext.mongoengine import MongoEngine
 
 db = MongoEngine()
 
-non_static_attrs = ['instrument', 'source', 'program', 'logger']
+non_static_attrs = ['source', 'program', 'logger']
 
 static_attrs = ['station_name', 'lat', 'lon', 'elevation',
                 'Year', 'Month', 'DOM', 'Minute', 'Hour',

@@ -3,10 +3,12 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
 from flask.ext.mongoengine import MongoEngine
 from flask.ext.bower import Bower
-
+from slacker import Slacker
 from config import config
+import os
 
 # Initialize the flask extensions for this app:
+slack = Slacker(os.environ.get('SLACK_TOKEN'))
 bootstrap = Bootstrap()
 bower = Bower()
 moment = Moment()

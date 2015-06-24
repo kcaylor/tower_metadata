@@ -1,6 +1,7 @@
 from . import db
 import errno
 from .file import File
+from app import slack
 
 
 def write_temp(client, file_location, this_file, f):
@@ -108,6 +109,11 @@ class Metadata(db.DynamicDocument):
                 self.day = self.date.day
             self.parse_files()
             self.save()
+            slack.chat.post_message(
+                '#mpalatower',
+                self.slack(),
+                username='Mpala Tower',
+                icon_emoji=':package:')
             return self
         else:
             return "No files found for %d, day of year %d" \
@@ -117,6 +123,19 @@ class Metadata(db.DynamicDocument):
         for f in self.files:
             f.parse()
         self.save()
+
+    def slack(self):
+        import os
+        url = os.environ.get('APP_URL')
+        link = "{url}/{year}/{doy}".format(
+            url=url,
+            year=self.year,
+            doy=self.doy)
+        return "Created metadata for {mon}/{day}/{year}\n{link}".format(
+            mon=self.month,
+            day=self.day,
+            year=self.year,
+            link=link)
 
     @staticmethod
     def generate_fake(count=10):
