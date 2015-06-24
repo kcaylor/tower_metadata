@@ -75,12 +75,6 @@ class File(db.DynamicEmbeddedDocument):
 
         # If this is our first time with this file, set the program name and
         # location.
-        if self.program_name is None or self.program_location is None:
-            ds, df_summ = self.process_netcdf(netcdf=self.file_location)
-        if self.source is None:
-            self.source = ds.attrs['source']
-        if self.program_name is None:
-            self.program_name = ds.attrs['program']
         self.program_location = join(
             dropbox_dir,
             'programs',

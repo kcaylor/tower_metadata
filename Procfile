@@ -1,3 +1,4 @@
 # Procfile for app
-web: python -u run.py
+web: python -u run.py serve
+
 
