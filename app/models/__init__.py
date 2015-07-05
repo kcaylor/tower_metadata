@@ -18,8 +18,8 @@ flag_by_units = {}
 # variable-specific limits taking precedence over unit-specifc ones
 variables = {
     'temp': {
-        'min': 0,
-        'max': 0,
+        'min': -40,
+        'max': 120,
         'units': ['Deg C', 'C', 'degC']
     },
     'percent': {
