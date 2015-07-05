@@ -45,8 +45,7 @@ class Variable(db.DynamicEmbeddedDocument):
             flags.append('missing some data')
             status = 'warning'
         # If we don't even have 50%, then there's a problem
-        elif self.expected_count / 12. <= self.count <= \
-                self.expected_count / 2.:
+        elif self.count <= self.expected_count / 2.:
             flags.append('missing lots of data')
             status = 'danger'
         # If there's no data at all, then go grey.
@@ -63,11 +62,11 @@ class Variable(db.DynamicEmbeddedDocument):
                 # Check to see if these units are within acceptable ranges:
                 if self.max_val > flag_by_units[self.units]['max']:
                     flags.append('contains high values')
-                    status = 'danger'
+                    status = 'info'
                     max_ok = False
                 if self.min_val < flag_by_units[self.units]['min']:
                     flags.append('contains low values')
-                    status = 'danger'
+                    status = 'info'
                     min_ok = False
         except:
             pass

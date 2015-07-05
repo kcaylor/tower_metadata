@@ -102,13 +102,13 @@ def create_app(config_name):
             if min_ok:
                 return 'default'
             else:
-                return 'warning'
+                return 'danger'
 
         def max_ok(max_ok):
             if max_ok:
                 return 'default'
             else:
-                return 'warning'
+                return 'danger'
 
         return dict(
             label_pct=label_pct,

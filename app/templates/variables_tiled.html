@@ -15,9 +15,9 @@
                     ({{ variable.units|replace("Deg ","&#176;")|replace("degC","&#176;C")|replace("meter^2","m<sup>2</sup>")|replace("m^3","m<sup>3</sup>")|replace("m^2","m<sup>2</sup>")|replace("percent","%")|safe }})
                     &nbsp;<span class="badge badge-{{ variable.status }}">
                         {% if variable.pct_data %}
-                            {{ variable.pct_data }}
+                            {{ variable.pct_data|int }}%
                         {% else %}
-                            {{ variable.count / variable.expected_count * 100|round }}
+                            {{ (variable.count / variable.expected_count * 100)|int }}%
                         {% endif %}
                     </span>
                                  
