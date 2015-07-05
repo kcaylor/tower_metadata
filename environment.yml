@@ -37,6 +37,7 @@ dependencies:
   - mongoengine==0.9.0
   - pyandoc==0.0.1
   - pymongo==2.8.0
+  - slacker==0.6.2
   - urllib3==1.10.3
   - waitress==0.8.9
   - werkzeug==0.10.4
