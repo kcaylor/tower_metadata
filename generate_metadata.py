@@ -28,10 +28,16 @@ parser.add_argument('-f', '--force', action='store_true',
                     help='force rebuilding of the metadata')
 parser.add_argument('-w', '--week', action='store_true',
                     help='check for previous 7 days')
-parser.add_argument('-y', '--year', metavar='YEAR', type=int, nargs='?',
-                    help='The year of the data you with to process (default: {YEAR})'.format(YEAR=year))
-parser.add_argument('-d', '--doy', metavar='DOY', type=int, nargs='?',
-                    help='The day of the year of the data you with to process (default: {DOY})'.format(DOY=doy))
+parser.add_argument(
+    '-y', '--year', metavar='YEAR', type=int, nargs='?',
+    help='The year of the data you with to process (default: {YEAR})'.format(
+        YEAR=year)
+)
+parser.add_argument(
+    '-d', '--doy', metavar='DOY', type=int, nargs='?',
+    help='The day of the year of the data you with to process (default: {DOY})'.format(
+        DOY=doy)
+)
 parser.add_argument('--dropbox', action='store_true',
                     help='pull files from our dropbox backup')
 
@@ -73,6 +79,9 @@ if Metadata.objects(year=year, doy=doy).first() is None:
 elif args.force:
     print "Forcing rebuild for YEAR:{year}, DOY:{doy}".format(
         year=year, doy=doy)
+    current_metadata = Metadata.objects(year=year, doy=doy)
+    for metadata in current_metadata:
+        metadata.delete()
     todays_metadata = Metadata(
         year=year,
         doy=doy,
@@ -99,12 +108,16 @@ if args.week:
             elif args.force:
                 print "Forcing rebuild for YEAR:{year}, DOY:{doy}".format(
                     year=year, doy=doy)
+                current_metadata = Metadata.objects(
+                    year=year, doy=each_day)
+                for metadata in current_metadata:
+                    metadata.delete()
                 todays_metadata = Metadata(
                     year=year,
                     doy=each_day,
                     files=find_files(
                         year=year, doy=each_day)
-                    ).generate_metadata()
+                ).generate_metadata()
             else:
                 print "Metadata for YEAR:{year}, DOY:{doy} already exists".format(
                     year=year, doy=each_day)
