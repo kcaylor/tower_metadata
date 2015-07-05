@@ -9,12 +9,16 @@
         {% endif %}
     {% endif %}
     <div class="col-sm-6 col-md-6">    
-        <div class="panel panel-primary">
+        <div class="panel panel-{{ variable.status }}">
             <div class="panel-heading">
                 <h4 class="panel-title">{{ variable.name|replace("_"," ")|title }}
                     ({{ variable.units|replace("Deg ","&#176;")|replace("degC","&#176;C")|replace("meter^2","m<sup>2</sup>")|replace("m^3","m<sup>3</sup>")|replace("m^2","m<sup>2</sup>")|replace("percent","%")|safe }})
-                    &nbsp;<span class="badge">
-                            {{ variable.count }}
+                    &nbsp;<span class="badge badge-{{ variable.status }}">
+                        {% if variable.pct_data %}
+                            {{ variable.pct_data }}
+                        {% else %}
+                            {{ variable.count / variable.expected_count * 100|round }}
+                        {% endif %}
                     </span>
                                  
                 </h4>
@@ -22,11 +26,11 @@
             <div class="panel-body">
                 <table class="table">
                     <tr>
-                        <th>min</th>
-                        <th>25th</th>
-                        <th>avg</th>
-                        <th>75th</th>
-                        <th>max</th>
+                        <th class="{{ min_ok(variable.min_ok) }}">min</th>
+                        <th class="default">25th</th>
+                        <th class="default">avg</th>
+                        <th class="default">75th</th>
+                        <th class="{{ max_ok(variable.max_ok) }}">max</th>
                     </tr>
                     <tr>
                         <td>{{ sig_fig(variable.min_val,3) }}</td>

@@ -42,7 +42,6 @@ class Metadata(db.DynamicDocument):
     summary = db.StringField()
     conventions = db.StringField()
     naming_authority = db.StringField()  # or URLField?
-
     # The Metadata object contains a list of Files:
     files = db.EmbeddedDocumentListField(File)
 
@@ -82,6 +81,8 @@ class Metadata(db.DynamicDocument):
                     file_location=file_location,
                 )
                 files.append(this_file)
+            else:
+                continue
         return files
 
     def generate_metadata(self):

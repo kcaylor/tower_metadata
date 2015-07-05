@@ -12,32 +12,78 @@ static_attrs = ['station_name', 'lat', 'lon', 'elevation',
 # writing the same unit, just put all the units in a list
 flag_by_units = {}
 
-temp_min = 0
-temp_max = 40
-temp = ['Deg C', 'C']
-for unit in temp:
-    flag_by_units.update({unit: {'min': temp_min, 'max': temp_max}})
+# TODO:
+# This isn't really by variable. It's by units. We should probably
+# think about how to set limits by _either_ variable or units, with
+# variable-specific limits taking precedence over unit-specifc ones
+variables = {
+    'temp': {
+        'min': 0,
+        'max': 0,
+        'units': ['Deg C', 'C', 'degC']
+    },
+    'percent': {
+        'min': 0,
+        'max': 0,
+        'units': ['percent', '%']
+    },
+    'energy_flux': {
+        'min': -800,
+        'max': 1400,
+        'units': ['W/m^2', 'W/meter^2']
+    },
+    'soil heat flux calibration': {  # NOT SURE ABOUT THESE MAX/MIN
+        'min': 0,  # Must be postivie
+        'max': 100,
+        'units': ['W/(m^2 mV)']
+    },
+    'battery voltage': {
+        'min': 11,
+        'max': 15,
+        'units': ['Volts', 'V']
+    },
+    'CS616 Period (uS)': {  # NOT SURE ABOUT THESE MAX/MIN
+        'min': 0,
+        'max': 2000,
+        'units': ['uSec']
 
-percent_min = 0
-percent_max = 100
-percent = ['percent', '%']
-for unit in percent:
-    flag_by_units.update({unit: {'min': percent_min, 'max': percent_max}})
+    },
+    'Kelvin temperature': {
+        'min': 233,  # About -40 degrees C. Seems safe.
+        'max': 350,  # About 120 degrees C. Toasty.
+        'units': ['K', 'Kelvin']
+    },
+    'pressure, kPa': {
+        'min': 0,  # Pressure has to be postive (in the atmosphere)
+        'max': 100,  # One atmosphere is 83kPa or something.
+        'units': ['kPa']
+    },
+    'millivolts': {
+        'min': 0,
+        'max': 5000,
+        'units': ['mV']
+    },
+    'wind speed': {
+        'min': -40,  # Seems a little outrageous, but neg for sonic
+        'max': 40,  # Again, higher than reasonable.
+        'units': ['m/s']
+    },
+    'molar fluxes': {
+        'min': -100,  # Can be negative (uptake of CO2)
+        'max': 100,
+        'units': ['umol/s/m2']
+    },
+    'nan': {
+        'min': -9999,
+        'max': 9999,
+        'units': ['nan']
+    }
+}
 
-shf_min = ''
-shf_max = ''
-shf = ['W/m^2']
-
-shf_cal_min = ''
-shf_cal_max = ''
-shf_cal = ['W/(m^2 mV)']
-
-batt_min = 11
-batt_max = 240
-batt = ['Volts', 'V']
-for unit in batt:
-    flag_by_units.update({unit: {'min': batt_min, 'max': batt_max}})
-
-PA_min = 15
-PA_max = 25
-PA = ['uSec']
+for variable in variables:
+    for unit in variables[variable]['units']:
+        flag_by_units.update({
+            unit: {
+                'min': variables[variable]['min'],
+                'max': variables[variable]['max']}
+        })

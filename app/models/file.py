@@ -51,17 +51,6 @@ class File(db.DynamicEmbeddedDocument):
     # The File object contains a list of Variables:
     variables = db.EmbeddedDocumentListField(Variable)
 
-    def get_program_local(self):
-        # Program locations should always be taken from dropbox.
-        # So we need to edit this.
-        from posixpath import join
-        import os
-        root_dir = os.environ.get('ROOT_DIR')
-        program_name = self.program
-        program_file = open(join(root_dir, 'programs', program_name))
-        program_content = program_file.readlines()
-        return program_name, program_content
-
     def get_program(self):
         # Must use Dropbox to get program files.
         from dropbox.client import DropboxClient
@@ -160,7 +149,7 @@ class File(db.DynamicEmbeddedDocument):
         ds, df_summ = self.process_netcdf(netcdf=self.file_location)
         self.source = ds.attrs['source']
         self.logger = ds.attrs['logger']
-        self.program = ds.attrs['program']
+        self.program_name = ds.attrs['program']
         self.datafile = ds.attrs['datafile']
         program_content = self.get_program()
         [

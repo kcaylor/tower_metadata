@@ -4,7 +4,6 @@ from . import db, flag_by_units
 # Variables contained within Files:
 class Variable(db.DynamicEmbeddedDocument):
 
-    flags = db.ListField(db.StringField())
     expected_count = db.IntField()
     name = db.StringField(db_field='var')
     units = db.StringField()
@@ -18,34 +17,69 @@ class Variable(db.DynamicEmbeddedDocument):
     content_type = db.StringField(db_field='content_coverage_type')
     comment = db.StringField()
 
+    # QA/QC stuff for this variable
+    status = db.StringField()
+    pct_data = db.FloatField()
+    min_ok = db.BooleanField()
+    max_ok = db.BooleanField()
+    flags = db.ListField(db.StringField())
+
+    # Clean automagically gets called by mongoengine whenever a
+    # variable is written to the db. Therefore, we put all our QA/QC
+    # code into clean()
     def clean(self):
         # Get the flag_by_units dict.
         # check status of data and raise flags
         flags = []
+        status = 'success'  # Default status is ok (green)
+        min_ok = True  # Assume that values are in range for min
+        max_ok = True  # Assume that values are in range for max
 
+        # If we have about 92% of the data, then just mention it
         if self.expected_count * 11. / 12. < self.count < self.expected_count:
             flags.append('missing a little data')
+            status = 'info'
+        # If we have more than 50% of the data, then warn us
         elif self.expected_count / 2. < self.count <= \
                 self.expected_count * 11. / 12.:
             flags.append('missing some data')
+            status = 'warning'
+        # If we don't even have 50%, then there's a problem
         elif self.expected_count / 12. <= self.count <= \
                 self.expected_count / 2.:
             flags.append('missing lots of data')
+            status = 'danger'
+        # If there's no data at all, then go grey.
         elif self.count == 0:
-            flags.append('no data')
-
+            flags.append('contains no data')
+            status = 'default'
+        # Check on variable min/max, specified by units
         try:
             if self.name.startswith('del'):
                 pass
             elif self.comment == 'Std':  # don't check std_dev
                 pass
             else:
+                # Check to see if these units are within acceptable ranges:
                 if self.max_val > flag_by_units[self.units]['max']:
                     flags.append('contains high values')
+                    status = 'danger'
+                    max_ok = False
                 if self.min_val < flag_by_units[self.units]['min']:
                     flags.append('contains low values')
+                    status = 'danger'
+                    min_ok = False
         except:
             pass
+        # Watch out for divide by zero stuff
+        if self.expected_count > 0:
+            self.pct_data = round(self.count / self.expected_count * 100)
+        else:
+            self.pct_data = 0
+        # Now assign the qa/qc variables
+        self.min_ok = min_ok
+        self.max_ok = max_ok
+        self.status = status
         self.flags = flags
 
     @staticmethod
@@ -69,7 +103,10 @@ class Variable(db.DynamicEmbeddedDocument):
             this_var = Variable(
                 name=var,
                 expected_count=ts,
-                count=df['count']
+                count=df['count'],
+                min_ok=1,
+                max_ok=1,
+                pct_data=0,
             )
         return this_var
 
@@ -94,6 +131,9 @@ class Variable(db.DynamicEmbeddedDocument):
             content_type=fake.word(),
             coordinates=fake.word(),
             comment=fake.sentence(),
-            expected_count=randint(1, 150)
+            expected_count=randint(1, 150),
+            max_ok=random() < 0.5,
+            min_ok=random() < 0.5,
+            pct_data=round(random() * 100)
         )
         return this_variable

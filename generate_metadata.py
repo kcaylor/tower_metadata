@@ -29,14 +29,17 @@ parser.add_argument('-f', '--force', action='store_true',
 parser.add_argument('-w', '--week', action='store_true',
                     help='check for previous 7 days')
 parser.add_argument('-y', '--year', metavar='YEAR', type=int, nargs='?',
-                    help='The year of the data you with to process')
+                    help='The year of the data you with to process (default: {YEAR})'.format(YEAR=year))
 parser.add_argument('-d', '--doy', metavar='DOY', type=int, nargs='?',
-                    help='The day of the year of the data you with to process')
+                    help='The day of the year of the data you with to process (default: {DOY})'.format(DOY=doy))
+parser.add_argument('--dropbox', action='store_true',
+                    help='pull files from our dropbox backup')
 
 args = parser.parse_args()
 
-if args.year and args.doy:
+if args.year:
     year = args.year
+if args.doy:
     doy = args.doy
 
 print "Parsing metdata for Year:{year}, DOY:{doy}".format(
@@ -53,13 +56,19 @@ this_config = config[os.getenv('FLASK_CONFIG') or 'default']
 # Make the database connection:
 connect(host=this_config().mongo_url())
 
+# Specify which find_files function to use:
+if args.dropbox:
+    find_files = DropboxFiles.find_files
+else:
+    find_files = Metadata.find_files
+
 # Check to see if we have this day already:
 if Metadata.objects(year=year, doy=doy).first() is None:
     # Try to build the file:
     todays_metadata = Metadata(
         year=year,
         doy=doy,
-        files=DropboxFiles.find_files(year=year, doy=doy)
+        files=find_files(year=year, doy=doy)
     ).generate_metadata()
 elif args.force:
     print "Forcing rebuild for YEAR:{year}, DOY:{doy}".format(
@@ -67,16 +76,12 @@ elif args.force:
     todays_metadata = Metadata(
         year=year,
         doy=doy,
-        files=DropboxFiles.find_files(year=year, doy=doy)
+        files=find_files(year=year, doy=doy)
     ).generate_metadata()
 else:
     print "Metadata already exists for YEAR:{year}, DOY:{doy}".format(
         year=year, doy=doy)
 
-if args.dropbox:
-    find_files = DropboxFiles.find_files(year=year, doy=each_day)
-else:
-    find_files = Metadata.find_files(year=year, doy=each_)          
 if args.week:
     if doy >= 7:
         print "Building prior 6 days of metadata, DOY:{start} to DOY:{end}".format(
@@ -89,7 +94,7 @@ if args.week:
                 todays_metadata = Metadata(
                     year=year,
                     doy=each_day,
-                    files=DropboxFiles.find_files(year=year, doy=each_day)
+                    files=find_files(year=year, doy=each_day)
                 ).generate_metadata()
             elif args.force:
                 print "Forcing rebuild for YEAR:{year}, DOY:{doy}".format(
@@ -97,7 +102,9 @@ if args.week:
                 todays_metadata = Metadata(
                     year=year,
                     doy=each_day,
-                    files=find_files()).generate_metadata
+                    files=find_files(
+                        year=year, doy=each_day)
+                    ).generate_metadata()
             else:
                 print "Metadata for YEAR:{year}, DOY:{doy} already exists".format(
                     year=year, doy=each_day)

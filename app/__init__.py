@@ -98,9 +98,23 @@ def create_app(config_name):
                 return 'danger'
             return 'warning'
 
+        def min_ok(min_ok):
+            if min_ok:
+                return 'default'
+            else:
+                return 'warning'
+
+        def max_ok(max_ok):
+            if max_ok:
+                return 'default'
+            else:
+                return 'warning'
+
         return dict(
             label_pct=label_pct,
-            sig_fig=sig_fig
+            sig_fig=sig_fig,
+            min_ok=min_ok,
+            max_ok=max_ok
         )
 
     return app
