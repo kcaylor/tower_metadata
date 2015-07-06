@@ -40,6 +40,8 @@ parser.add_argument(
 )
 parser.add_argument('--dropbox', action='store_true',
                     help='pull files from our dropbox backup')
+parser.add_argument('-n', '--next', metavar='NEXT', type=int, nargs='?',
+    help='Parse the next N days, starting with the current YEAR, DOY')
 
 args = parser.parse_args()
 
@@ -77,7 +79,7 @@ if Metadata.objects(year=year, doy=doy).first() is None:
         files=find_files(year=year, doy=doy)
     ).generate_metadata()
 elif args.force:
-    print "Forcing rebuild for YEAR:{year}, DOY:{doy}".format(
+    print "Forcing rebuild for Year:{year}, DOY:{doy}".format(
         year=year, doy=doy)
     current_metadata = Metadata.objects(year=year, doy=doy)
     for metadata in current_metadata:
@@ -88,8 +90,36 @@ elif args.force:
         files=find_files(year=year, doy=doy)
     ).generate_metadata()
 else:
-    print "Metadata already exists for YEAR:{year}, DOY:{doy}".format(
+    print "Metadata already exists for Year:{year}, doy:{doy}".format(
         year=year, doy=doy)
+
+if args.next:
+    for day in range(doy + 1, doy + args.next):
+        if Metadata.objects(year=year, doy=day).first() is None:
+                # Try to build the file:
+                print "Building metadata for YEAR:{year}, DOY:{doy}".format(
+                    year=year, doy=day)
+                todays_metadata = Metadata(
+                    year=year,
+                    doy=day,
+                    files=find_files(year=year, doy=day)
+                ).generate_metadata()
+        elif args.force:
+            print "Forcing rebuild for YEAR:{year}, DOY:{doy}".format(
+                year=year, doy=day)
+            current_metadata = Metadata.objects(
+                year=year, doy=day)
+            for metadata in current_metadata:
+                metadata.delete()
+            todays_metadata = Metadata(
+                year=year,
+                doy=day,
+                files=find_files(
+                    year=year, doy=day)
+            ).generate_metadata()
+        else:
+            print "Metadata for YEAR:{year}, DOY:{doy} already exists".format(
+                year=year, doy=day)
 
 if args.week:
     if doy >= 7:
@@ -97,9 +127,11 @@ if args.week:
             start=doy - 6, end=doy - 1)
         # Okay, we're done with today.
         # Let's check the previous 6 days too, just in case:
-        for each_day in range(doy - 6, doy - 1):
+        for each_day in range(doy - 6, doy):
             if Metadata.objects(year=year, doy=each_day).first() is None:
                 # Try to build the file:
+                print "Building metadata for YEAR:{year}, DOY:{doy}".format(
+                    year=year, doy=each_day)
                 todays_metadata = Metadata(
                     year=year,
                     doy=each_day,
@@ -107,7 +139,7 @@ if args.week:
                 ).generate_metadata()
             elif args.force:
                 print "Forcing rebuild for YEAR:{year}, DOY:{doy}".format(
-                    year=year, doy=doy)
+                    year=year, doy=each_day)
                 current_metadata = Metadata.objects(
                     year=year, doy=each_day)
                 for metadata in current_metadata:

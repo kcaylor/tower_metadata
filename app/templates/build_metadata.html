@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+
+{% block title %} Mpala Tower Metadata and Download{% endblock %}
+
+{% block page_content %}
+
+<div class="jumbotron">
+  <h2>No metadata exists for .</h2>
+  <p>Our most recent metadata is from {{ moment(metadata.date).format('dddd, MMMM Do YYYY') }}, {{ moment(metadata.date).fromNow(refresh=True) }}</p>
+</div>
+
+{% endblock %}

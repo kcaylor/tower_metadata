@@ -2,6 +2,7 @@ from . import db
 import errno
 from .file import File
 from app import slack
+from datetime import datetime
 
 
 def write_temp(client, file_location, this_file, f):
@@ -39,6 +40,7 @@ class Metadata(db.DynamicDocument):
     month = db.IntField(required=True)
     doy = db.IntField(required=True)
     date = db.DateTimeField(required=True)
+    created = db.DateTimeField(default=datetime.now())
     summary = db.StringField()
     conventions = db.StringField()
     naming_authority = db.StringField()  # or URLField?
