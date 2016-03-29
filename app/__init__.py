@@ -2,7 +2,7 @@
 from flask import Flask, render_template
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
-from flask.ext.mailgun import Mailgun
+# from flask.ext.mailgun import Mailgun
 from flask.ext.wtf import CsrfProtect
 from flask.ext.bower import Bower
 from config import config
@@ -15,7 +15,7 @@ bootstrap = Bootstrap()
 bower = Bower()
 moment = Moment()
 csrf = CsrfProtect()
-mail = Mailgun()
+# mail = Mailgun()
 
 
 login_manager.session_protection = 'strong'
@@ -45,8 +45,8 @@ def create_app(config_name):
     from main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    # from .auth import auth as auth_blueprint
+    # app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     from .ajax import ajax as ajax_blueprint
     app.register_blueprint(ajax_blueprint, url_prefix='/ajax')

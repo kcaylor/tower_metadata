@@ -2,7 +2,6 @@ Flask==0.10.1
 Flask-Bootstrap==3.3.2.1
 Flask-Bower==1.1.1
 Flask-Login==0.3.2
-Flask-Mailgun==0.4
 Flask-Moment==0.4.0
 Flask-Script==2.0.5
 Flask-WTF==0.11
@@ -49,5 +48,3 @@ urllib3==1.10.3
 waitress==0.8.9
 wsgiref==0.1.2
 xarray==0.7.2
-flask-mailgun
-
