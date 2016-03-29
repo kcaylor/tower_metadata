@@ -40,7 +40,7 @@ class TestingConfig(Config):
 
 class DevelopmentConfig(Config):
     ROOT_DIR = os.environ.get('ROOT_DIR')
-    SERVER_NAME = '0.0.0.0:5000'
+    SERVER_NAME = 'mpala.herokuapp.com'
     DEBUG = True
     # MONGODB_DB = os.environ.get('MONGODB_DEV_DATABASE')
     # MONGODB_USERNAME = os.environ.get('MONGODB_DEV_USER')
