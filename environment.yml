@@ -3,6 +3,7 @@ dependencies:
 - binstar=0.10.3=py27_0
 - clyent=0.3.4=py27_0
 - curl=7.38.0=0
+- cffi==1.1.2
 - hdf5=1.8.14=0
 - libnetcdf=4.3.2=1
 - netcdf4=1.1.6=np19py27_0
@@ -26,7 +27,6 @@ dependencies:
   - anyjson==0.3.3
   - billiard==3.3.0.23
   - celery==3.1.23
-  - cffi==1.1.2
   - cryptography==0.9.1
   - docopt==0.6.2
   - enum34==1.0.4
