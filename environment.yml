@@ -35,6 +35,7 @@ dependencies:
   - flask==0.10.1
   - flask-bootstrap==3.3.2.1
   - flask-bower==1.1.1
+  - flask-mailgun==0.4
   - flask-moment==0.4.0
   - flask-login==0.3.2
   - flask-moment==0.4.0
