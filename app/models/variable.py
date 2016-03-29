@@ -1,10 +1,24 @@
+"""Variable Definitions from Mpala Tower Data to be used in Metadata."""
 from . import db, flag_by_units
+from . import DATA_FILES
+
+VARIABLE_CONTEXTS = [
+    'Soil',
+    'Air',
+    'Upwelling',
+    'Downwelling',
+    'Surface',
+    ''
+]
 
 
 # Variables contained within Files:
 class Variable(db.DynamicEmbeddedDocument):
+    """Definition of Variable class to be used in MongoEngine."""
 
     expected_count = db.IntField()
+    context = db.StringField(choices=VARIABLE_CONTEXTS, default='')
+    filename = db.StringField(choices=DATA_FILES, default='unknown')
     name = db.StringField(db_field='var')
     units = db.StringField()
     count = db.IntField()
@@ -28,6 +42,7 @@ class Variable(db.DynamicEmbeddedDocument):
     # variable is written to the db. Therefore, we put all our QA/QC
     # code into clean()
     def clean(self):
+        """QA/QC Methods for variables."""
         # Get the flag_by_units dict.
         # check status of data and raise flags
         flags = []
@@ -54,6 +69,7 @@ class Variable(db.DynamicEmbeddedDocument):
             status = 'default'
         # Check on variable min/max, specified by units
         try:
+            # TODO: Check flag_by_variable_name for this variable.
             if self.name.startswith('del'):
                 pass
             elif self.comment == 'Std':  # don't check std_dev
@@ -83,6 +99,7 @@ class Variable(db.DynamicEmbeddedDocument):
 
     @staticmethod
     def generate_variable(var=None, ds=None, df=None, ts=None):
+        """Create a Variable object."""
         if df['count'] != 0:
             this_var = Variable(
                 name=var,
@@ -111,6 +128,7 @@ class Variable(db.DynamicEmbeddedDocument):
 
     @staticmethod
     def generate_fake(n=7):
+        """Create a fake Variable object for use in testing and development."""
         from random import choice, randint, random
         from faker import Faker
         fake = Faker()

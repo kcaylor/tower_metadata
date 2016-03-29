@@ -3,6 +3,11 @@
 # Do this before anything else!
 import os
 import argparse
+from datetime import datetime
+# Import the ORM for the metadata
+from mongoengine import connect
+from app.models.metadata import Metadata, DropboxFiles
+from config import config
 
 if os.path.exists('.env'):
         print('Importing environment from .env...')
@@ -12,7 +17,6 @@ if os.path.exists('.env'):
                 os.environ[var[0]] = var[1]
 
 # Figure out what day it is:
-from datetime import datetime
 date = datetime.now()
 year = date.year
 doy = date.toordinal() - datetime(
@@ -35,12 +39,13 @@ parser.add_argument(
 )
 parser.add_argument(
     '-d', '--doy', metavar='DOY', type=int, nargs='?',
-    help='The day of the year of the data you with to process (default: {DOY})'.format(
+    help='The day of the year of the data to process (default: {DOY})'.format(
         DOY=doy)
 )
 parser.add_argument('--dropbox', action='store_true',
                     help='pull files from our dropbox backup')
-parser.add_argument('-n', '--next', metavar='NEXT', type=int, nargs='?',
+parser.add_argument(
+    '-n', '--next', metavar='NEXT', type=int, nargs='?',
     help='Parse the next N days, starting with the current YEAR, DOY')
 
 args = parser.parse_args()
@@ -53,12 +58,7 @@ if args.doy:
 print "Parsing metdata for Year:{year}, DOY:{doy}".format(
     year=year, doy=doy)
 
-# Import the ORM for the metadata
-from mongoengine import connect
-from app.models.metadata import Metadata, DropboxFiles
-
 # Set the config settings to whatever the app is using.
-from config import config
 this_config = config[os.getenv('FLASK_CONFIG') or 'default']
 
 # Make the database connection:
@@ -123,7 +123,7 @@ if args.next:
 
 if args.week:
     if doy >= 7:
-        print "Building prior 6 days of metadata, DOY:{start} to DOY:{end}".format(
+        print "Building 6 days of metadata, DOY:{start} to DOY:{end}".format(
             start=doy - 6, end=doy - 1)
         # Okay, we're done with today.
         # Let's check the previous 6 days too, just in case:
@@ -151,7 +151,7 @@ if args.week:
                         year=year, doy=each_day)
                 ).generate_metadata()
             else:
-                print "Metadata for YEAR:{year}, DOY:{doy} already exists".format(
+                print "Metadata for YEAR:{year}, DOY:{doy} exists".format(
                     year=year, doy=each_day)
     else:
         print "Cannot build prior week for DOY less than 7"

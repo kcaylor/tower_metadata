@@ -1,11 +1,16 @@
-from . import db
+"""Definition of the Metadata class for Mpala Tower Data."""
+from . import db, DATA_FILES
 import errno
 from .file import File
-from app import slack
+from slacker import Slacker
 from datetime import datetime
+import os
+
+slack = Slacker(os.environ.get('SLACK_TOKEN'))
 
 
 def write_temp(client, file_location, this_file, f):
+    """Write temporary files on heroku."""
     import os
     # this is probably not a good place to store them
     # the actual code
@@ -28,6 +33,7 @@ def write_temp(client, file_location, this_file, f):
 
 # The Metadata object
 class Metadata(db.DynamicDocument):
+    """Define the Metadata Object model in Mongoengine."""
 
     license = db.StringField()
     title = db.StringField()
@@ -60,21 +66,24 @@ class Metadata(db.DynamicDocument):
     }
 
     def __repr__(self):
+        """Representation of the Metadata class for the Mpala Tower."""
         return '<Metadata for doy: %d, year: %d>' % (self.doy, self.year)
 
     def get_id(self):
+        """Metadata object ID on the MongoDb."""
         return unicode(self.id)
 
     # Look for files in a file system. We will subclass this class
     # to create a system that looks for files on Dropbox, etc...
     @staticmethod
     def find_files(year=None, doy=None):
+        """Find NetCDF files for this year and doy."""
         import os
         from posixpath import join
         root_dir = os.environ.get('ROOT_DIR')
         files = []  # Initialize an empty array
         f = 'raw_MpalaTower_%i_%03d.nc' % (year, doy)
-        for this_file in File.DATA_FILES:
+        for this_file in DATA_FILES:
             if f in os.listdir(join(root_dir, this_file)):
                 file_location = join(root_dir, this_file, f)
                 this_file = File(
@@ -88,6 +97,7 @@ class Metadata(db.DynamicDocument):
         return files
 
     def generate_metadata(self):
+        """Generate metadata from list of metadata files."""
         if len(self.files) > 0:
             this_netcdf = self.files[0].file_location
             ds, df_summ = self.files[0].process_netcdf(netcdf=this_netcdf)
@@ -123,11 +133,13 @@ class Metadata(db.DynamicDocument):
                 % (self.year, self.doy)
 
     def parse_files(self):
+        """Parse the NetCDF file list."""
         for f in self.files:
             f.parse()
         self.save()
 
     def slack(self):
+        """Report metadata progress to Slack."""
         import os
         url = os.environ.get('APP_URL')
         link = "{url}/{year}/{doy}".format(
@@ -142,6 +154,7 @@ class Metadata(db.DynamicDocument):
 
     @staticmethod
     def generate_fake(count=10):
+        """Generate fake metadata objects for testing and development."""
         from random import randint
         from faker import Faker
         fake = Faker()
@@ -173,13 +186,16 @@ class Metadata(db.DynamicDocument):
 
 
 class DropboxFiles(Metadata):
+    """Dropbox Metadata Class for the Mpala Tower."""
 
     def __repr__(self):
+        """Representation of Dropbox Metadata class."""
         return '<Dropbox Metadata for doy: %d, year: %d>' \
             % (self.doy, self.year)
 
     @staticmethod
     def find_files(year=None, doy=None):
+        """Find netcdf files correponding to year and doy on Dropbox."""
         from dropbox.client import DropboxClient
         from posixpath import join
         import os
@@ -190,8 +206,9 @@ class DropboxFiles(Metadata):
         client = DropboxClient(access_token)
 
         files = []  # Initialize an empty array
-        f = 'raw_MpalaTower_%i_%03d.nc' % (year, doy)
-        for this_file in File.DATA_FILES:
+        f = 'raw_MpalaTower_{year}_{doy:03d}.nc'.format(
+            year=year, doy=doy)
+        for this_file in DATA_FILES:
             file_location = join(dropbox_dir, this_file)
             listdict = []
             # listdict has a good metadata in it if we ever decide to use it

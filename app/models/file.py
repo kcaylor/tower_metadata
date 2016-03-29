@@ -1,9 +1,11 @@
-from . import db
+"""File Class Definition for Mpala Tower Metadata."""
+from . import db, DATA_FILES
 from variable import Variable
-import xray
+import xarray
 
 
 def convert_to_sec(num, units):
+    """Convert time units to seconds."""
     if units.startswith(('Min', 'min')):
         out = int(num) * 60
     elif units.startswith(('ms', 'mS')):
@@ -18,18 +20,7 @@ def convert_to_sec(num, units):
 
 # Files contained within Metadata:
 class File(db.DynamicEmbeddedDocument):
-
-    DATA_FILES = [
-        'upper',        # Let's comment each of these...
-        'Table1',       #
-        'lws',          #
-        'licor6262',    #
-        'WVIA',         #
-        'Manifold',     #
-        'flux',         #
-        'ts_data',      #
-        'Table1Rain'    #
-    ]
+    """File object model defined for use in MongoEngine."""
 
     source = db.StringField()
     logger = db.StringField()
@@ -52,6 +43,7 @@ class File(db.DynamicEmbeddedDocument):
     variables = db.EmbeddedDocumentListField(Variable)
 
     def get_program(self):
+        """Retrieve a program file from the Mpala Tower Dropbox listings."""
         # Must use Dropbox to get program files.
         from dropbox.client import DropboxClient
         from posixpath import join
@@ -78,7 +70,7 @@ class File(db.DynamicEmbeddedDocument):
 
     @staticmethod
     def get_programmed_frequency(program_content=None, datafile=None):
-
+        """Determine the frequency of data collection from the program file."""
         lines = program_content
         i = 0
         k = 0
@@ -127,10 +119,11 @@ class File(db.DynamicEmbeddedDocument):
 
     @staticmethod
     def process_netcdf(netcdf=None):
+        """Process a netCDF file into a dataframe and summary."""
         from . import static_attrs
 
-        ds = xray.Dataset()
-        ds = xray.open_dataset(
+        ds = xarray.Dataset()
+        ds = xarray.open_dataset(
             netcdf,
             decode_cf=True,
             decode_times=True
@@ -146,6 +139,7 @@ class File(db.DynamicEmbeddedDocument):
         return ds, df_summ
 
     def parse(self):
+        """Parse a netcdf file to extract metadata information."""
         ds, df_summ = self.process_netcdf(netcdf=self.file_location)
         self.source = ds.attrs['source']
         self.logger = ds.attrs['logger']
@@ -173,10 +167,12 @@ class File(db.DynamicEmbeddedDocument):
 
     @staticmethod
     def generate_fake():
+        """Generate a fake File object for testing and development."""
         from random import choice
         from faker import Faker
         fake = Faker()
         this_file = File(
+            datafile=choice(DATA_FILES),
             source=fake.word(),
             logger=fake.word(),
             filename=fake.word(),

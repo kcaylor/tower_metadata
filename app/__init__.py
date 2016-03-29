@@ -1,22 +1,32 @@
+"""Create the Tower_Metadata application."""
 from flask import Flask, render_template
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
-from flask.ext.mongoengine import MongoEngine
+from flask.ext.mailgun import Mailgun
+from flask.ext.wtf import CsrfProtect
 from flask.ext.bower import Bower
-from slacker import Slacker
 from config import config
-import os
+
+from app.models import db, login_manager
 
 # Initialize the flask extensions for this app:
-slack = Slacker(os.environ.get('SLACK_TOKEN'))
+# slack = Slacker(os.environ.get('SLACK_TOKEN'))
 bootstrap = Bootstrap()
 bower = Bower()
 moment = Moment()
-db = MongoEngine()  # Warning: Must use pymongo 2.8 w/ mongoengine 0.7.1
+csrf = CsrfProtect()
+mail = Mailgun()
+
+
+login_manager.session_protection = 'strong'
+login_manager.login_view = 'auth.login'
+login_manager.login_message = \
+    'Give your data a pulse by logging in or signing up!'
+login_manager.login_message_category = "info"
 
 
 def create_app(config_name):
-
+    """Create the tower_metadata application for deployment."""
     # Do the stuff necessary to set up the Flask application
     app = Flask(__name__)
     # Let's use the default config for now (set to Development):
@@ -28,47 +38,24 @@ def create_app(config_name):
     moment.init_app(app)
     db.init_app(app)
     bower.init_app(app)
+    csrf.init_app(app)
+    login_manager.init_app(app)
 
-    from app.models.metadata import Metadata
+    # attach routes and custom error pages here
+    from main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
 
-    # Set up the application routes:
-    @app.route('/')
-    def index():
-        metadata = Metadata.objects().first()
-        return render_template(
-            'index.html',
-            metadata=metadata)
+    from .auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
-    @app.route('/<int:year>/<int:doy>')
-    def file_year_doy(year=2015, doy=1):
-        from datetime import datetime
-        metadata = Metadata.objects(
-            year=year,
-            doy=doy).first()
-        jan1 = datetime(year=2015, month=1, day=1)
-        date = datetime.fromordinal(jan1.toordinal() + doy)
-        if metadata is None:
-            return render_template(
-                'build_metadata.html',
-                date=date
-            )
-        else:
-            return render_template(
-                'file.html',
-                metadata=metadata)
+    from .ajax import ajax as ajax_blueprint
+    app.register_blueprint(ajax_blueprint, url_prefix='/ajax')
 
-    @app.route('/<int:year>/<int:month>/<int:day>')
-    def file_year_month_day(year=2015, month=1, day=20):
-        from datetime import datetime
-        date = datetime(year=year, month=month, day=day)
-        metadata = Metadata.objects(
-            date=date).first()
-        if metadata is None:
-            return render_template('404.html')
-        else:
-            return render_template(
-                'file.html',
-                metadata=metadata)
+    # @app.route('/thisweek')
+    # def this_week():
+    #     from datetime import datetime
+    #     date = datetime.now()
+    #     # Find the Metadata from the past week.
 
     @app.errorhandler(404)
     def page_not_found(e):

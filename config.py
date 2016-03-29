@@ -28,6 +28,7 @@ class Config:
 
 class TestingConfig(Config):
     TESTING = True
+    SERVER_NAME = '0.0.0.0:5000'
     MONGODB_SETTINGS = {
         "db": 'testing',
         "username": '',
@@ -39,6 +40,7 @@ class TestingConfig(Config):
 
 class DevelopmentConfig(Config):
     ROOT_DIR = os.environ.get('ROOT_DIR')
+    SERVER_NAME = '0.0.0.0:5000'
     DEBUG = True
     # MONGODB_DB = os.environ.get('MONGODB_DEV_DATABASE')
     # MONGODB_USERNAME = os.environ.get('MONGODB_DEV_USER')

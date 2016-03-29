@@ -3,11 +3,34 @@
 
 {% block title %} Mpala Tower Metadata and Download{% endblock %}
 
+
+{% block head %}
+    {{ super() }}
+    <link href="/static/css/ladda.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('bower.static', filename='jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ url_for('bower.static', filename='spin.js/spin.js') }}"></script>
+    <script src="{{ url_for('bower.static', filename='Ladda/dist/ladda.min.js') }}"></script>
+    <script src="{{ url_for('bower.static', filename='Ladda/dist/ladda.jquery.min.js') }}"></script>
+    <script src="/static/js/build_metadata.js"></script>
+{% endblock %}
+
+
 {% block page_content %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <div class="jumbotron">
-  <h2>No metadata exists for .</h2>
-  <p>Our most recent metadata is from {{ moment(metadata.date).format('dddd, MMMM Do YYYY') }}, {{ moment(metadata.date).fromNow(refresh=True) }}</p>
+  <h2>No metadata exists for {{moment(date).format('dddd, MMMM Do YYYY')}}</h2>
+  <div>
+  <br>
+    <a href=# id="BuildButton" onclick="create_metadata('{{date.year}}','{{doy}}')" class="btn btn-primary btn-s ladda-button" data-style="expand-right" data-color="green" data-size="s"><span class="ladda-label">Generate Metadata</span>
+    </a>
+  <br>
+  &nbsp;
+</div>
 </div>
 
 {% endblock %}

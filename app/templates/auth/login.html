@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}PulsePod - Login{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Login</h1>
+</div>
+<div class="col-md-4">
+    {{ wtf.quick_form(form) }}
+    <p>Forgot your password? <a href="{{ url_for('auth.password_reset_request') }}">Reset it</a>.</p>
+    <p>New User? <a href="{{ url_for('auth.signup') }}">Sign up</a>.</p>
+</div>
+{% endblock %}
