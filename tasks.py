@@ -58,3 +58,9 @@ def create_metadata_task(self, year, doy):
         doy=doy,
         files=find_files(year=year, doy=doy)
     ).generate_metadata()
+
+
+@celery.task(bind=True)
+def process_smap_data(self):
+    """Update SMAP data and upload to FTP server."""
+    self.update_state(state='PROGRESS')

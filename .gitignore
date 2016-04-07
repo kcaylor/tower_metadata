@@ -5,6 +5,9 @@ venv
 .env_dev_heroku
 .env_prod_heroku
 
+# Ignoring requirements.txt for this app, because of miniconda:
+requirements.txt
+
 # Utility scripts for Kelly (and Gist):
 config.codekit
 .codekit-cache
