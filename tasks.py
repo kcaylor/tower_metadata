@@ -20,7 +20,7 @@ this_config = os.getenv('FLASK_CONFIG') or 'default'
 app = Flask(__name__)
 app.config.from_object(config[this_config])
 config[this_config].init_app(app)
-host = config[config_name]().MONGODB_SETTINGS['HOST']
+host = config[this_config]().MONGODB_SETTINGS['HOST']
 connect(
     db='pulsepod-restore',
     host=host
