@@ -1,9 +1,9 @@
+"""Celery tasks for tower app."""
 from flask import Flask
-from flask.ext.mongoengine import MongoEngine
+from mongoengine import connect
 from config import config
 from celery import Celery
 import datetime
-from mongoengine import connect
 
 
 """Celery application code."""
@@ -20,8 +20,11 @@ this_config = os.getenv('FLASK_CONFIG') or 'default'
 app = Flask(__name__)
 app.config.from_object(config[this_config])
 config[this_config].init_app(app)
-db = MongoEngine()
-db.init_app(app)
+host = config[config_name]().MONGODB_SETTINGS['HOST']
+connect(
+    db='pulsepod-restore',
+    host=host
+)
 
 from app.models import Metadata, DropboxFiles
 

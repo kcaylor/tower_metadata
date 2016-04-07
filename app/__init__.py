@@ -6,7 +6,7 @@ from flask.ext.moment import Moment
 from flask.ext.wtf import CsrfProtect
 from flask.ext.bower import Bower
 from config import config
-
+from pymongo import ReadPreference
 from app.models import db, login_manager
 
 # Initialize the flask extensions for this app:
@@ -36,11 +36,19 @@ def create_app(config_name):
     # Initialize the Flask extensions:
     bootstrap.init_app(app)
     moment.init_app(app)
-    db.init_app(app)
     bower.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)
 
+    from mongoengine import connect
+    host = config[config_name]().MONGODB_SETTINGS['HOST']
+    connect(
+        db='pulsepod-restore',
+        host=host
+    )
+    if config_name is 'testing':
+        db.init_app(app)
+        db.read_preference = ReadPreference.PRIMARY_PREFERRED
     # attach routes and custom error pages here
     from main import main as main_blueprint
     app.register_blueprint(main_blueprint)
