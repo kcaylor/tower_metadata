@@ -47,4 +47,4 @@ slacker==0.6.2
 urllib3==1.10.3
 waitress==0.8.9
 wsgiref==0.1.2
-xarray==0.7.2
+# xarray==0.7.2

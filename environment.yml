@@ -22,6 +22,7 @@ dependencies:
 - sqlite=3.8.4.1=1
 - tk=8.5.18=0
 - zlib=1.2.8=0
+- xarray==0.7.2
 - pip:
   - amqp==1.4.9
   - anyjson==0.3.3
@@ -68,5 +69,5 @@ dependencies:
   - werkzeug==0.10.4
   - wtforms==2.0.2
   - wsgiref==0.1.2
-  - xarray==0.7.2
+
 

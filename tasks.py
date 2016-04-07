@@ -1,3 +1,11 @@
+from flask import Flask
+from flask.ext.mongoengine import MongoEngine
+from config import config
+from celery import Celery
+import datetime
+from mongoengine import connect
+
+
 """Celery application code."""
 import os
 if os.path.exists('.env'):
@@ -6,17 +14,19 @@ if os.path.exists('.env'):
         if len(var) == 2:
             os.environ[var[0]] = var[1]
 
-from config import config
-from celery import Celery
-import datetime
-from app.models import Metadata, DropboxFiles
-from mongoengine import connect
-
 # Make the database connection:
 # Set the config settings to whatever the app is using.
-this_config = config[os.getenv('FLASK_CONFIG') or 'default']
+this_config = os.getenv('FLASK_CONFIG') or 'default'
+app = Flask(__name__)
+app.config.from_object(config[this_config])
+config[this_config].init_app(app)
+db = MongoEngine()
+db.init_app(app)
+
+from app.models import Metadata, DropboxFiles
+
 # Make the database connection:
-connect(host=this_config().mongo_url())
+# connect(host=this_config().mongo_url())
 find_files = DropboxFiles.find_files
 
 celery = Celery('mpala_tower')
