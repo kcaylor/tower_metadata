@@ -2,19 +2,19 @@
 # Read in all the app config settings stored in .env
 # Do this before anything else!
 import os
-import argparse
-from datetime import datetime
-# Import the ORM for the metadata
-from mongoengine import connect
-from app.models.metadata import Metadata, DropboxFiles
-from config import config
-
 if os.path.exists('.env'):
         print('Importing environment from .env...')
         for line in open('.env'):
             var = line.strip().split('=')
             if len(var) == 2:
                 os.environ[var[0]] = var[1]
+
+import argparse
+from datetime import datetime
+# Import the ORM for the metadata
+from mongoengine import connect
+from app.models.metadata import Metadata, DropboxFiles
+from config import config
 
 # Figure out what day it is:
 date = datetime.now()
@@ -62,7 +62,7 @@ print "Parsing metdata for Year:{year}, DOY:{doy}".format(
 this_config = config[os.getenv('FLASK_CONFIG') or 'default']
 
 # Make the database connection:
-connect(host=this_config().mongo_url())
+connect(host=this_config.MONGODB_SETTINGS['HOST'])
 
 # Specify which find_files function to use:
 if args.dropbox:

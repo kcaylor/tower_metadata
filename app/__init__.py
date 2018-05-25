@@ -43,7 +43,7 @@ def create_app(config_name):
     from mongoengine import connect
     host = config[config_name]().MONGODB_SETTINGS['HOST']
     connect(
-        # db='pulsepod-restore',  # Not needed because db is in the host uri.
+        db='pulsepod-restore',  # Not needed because db is in the host uri, or maybe not.
         host=host
     )
     if config_name is 'testing':

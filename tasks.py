@@ -45,12 +45,6 @@ def doy(date=None):
     return this_ordinal - year_ordinal + 1
 
 
-@celery.task
-def add(x, y):
-    """Add two numbers."""
-    return x + y
-
-
 @celery.task(bind=True)
 def create_metadata_task(self, year, doy):
     """Celery task to create metadata."""
