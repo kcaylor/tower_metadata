@@ -8,6 +8,7 @@ import os
 
 slack = Slacker(os.environ.get('SLACK_TOKEN'))
 
+netcdf_location = 'raw_netCDF_output'
 
 def write_temp(client, file_location, this_file, f):
     """Write temporary files on heroku."""
@@ -23,10 +24,12 @@ def write_temp(client, file_location, this_file, f):
     temp_location = '/tmp/%s/' % this_file + f
     # Check to see if the file is already there. It's faster.
     if not os.path.isfile(temp_location):
-        out = open(temp_location, 'wb')
-        with client.get_file(file_location) as f:
-            out.write(f.read())
-        out.close()
+        client.files_download_to_file(temp_location, file_location)
+        # out = open(temp_location, 'wb')
+
+        # with client.files_download(file_location) as f:
+        #     out.write(f.read())
+        # out.close()
     print(temp_location)
     return temp_location
 
@@ -196,27 +199,31 @@ class DropboxFiles(Metadata):
     @staticmethod
     def find_files(year=None, doy=None):
         """Find netcdf files correponding to year and doy on Dropbox."""
-        from dropbox.client import DropboxClient
+        from dropbox import Dropbox
         from posixpath import join
         import os
 
         access_token = os.environ.get('access_token')
         dropbox_dir = os.environ.get('dropbox_dir')
 
-        client = DropboxClient(access_token)
+        client = Dropbox(access_token)
 
         files = []  # Initialize an empty array
         f = 'raw_MpalaTower_{year}_{doy:03d}.nc'.format(
             year=year, doy=doy)
-        for this_file in DATA_FILES:
-            file_location = join(dropbox_dir, this_file)
-            listdict = []
+        program_list = DATA_FILES
+        program_list.remove('unknown')
+        for this_file in program_list:
+            file_location = join(dropbox_dir, netcdf_location, this_file)
+            matches = []
             # listdict has a good metadata in it if we ever decide to use it
-            listdict = client.search(file_location, f, file_limit=1)
-            if listdict != []:
+            results = client.files_search(file_location, f, max_results=1)
+            matches = results.matches
+            if matches:
+                match = matches[0]
                 temp_location = write_temp(
                     client,
-                    listdict[0]['path'],
+                    match.metadata.path_display,
                     this_file,
                     f
                 )

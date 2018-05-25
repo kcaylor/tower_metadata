@@ -31,7 +31,7 @@ dependencies:
   - cryptography==0.9.1
   - docopt==0.6.2
   - enum34==1.0.4
-  - dropbox==2.2.0
+  - dropbox==8.9.0
   - fake-factory==0.5.0
   - flask==0.10.1
   - flask-bootstrap==3.3.2.1

@@ -39,7 +39,7 @@ class Config:
     SECRET_KEY = os.environ.get('APP_SECRET')
     ROOT_DIR = os.environ.get('ROOT_DIR')
     SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
-
+    
     @staticmethod
     def init_app(app):
         """Initialize the config."""

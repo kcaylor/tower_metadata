@@ -2,7 +2,9 @@
 from . import db, DATA_FILES
 from variable import Variable
 import xarray
+import requests
 
+program_location = 'programs'
 
 def convert_to_sec(num, units):
     """Convert time units to seconds."""
@@ -25,7 +27,7 @@ class File(db.DynamicEmbeddedDocument):
     source = db.StringField()
     logger = db.StringField()
     datafile = db.StringField(
-        choices=DATA_FILES
+        # choices=DATA_FILES
     )
     filename = db.StringField()
     frequency = db.FloatField()
@@ -45,26 +47,27 @@ class File(db.DynamicEmbeddedDocument):
     def get_program(self):
         """Retrieve a program file from the Mpala Tower Dropbox listings."""
         # Must use Dropbox to get program files.
-        from dropbox.client import DropboxClient
+        from dropbox import Dropbox
         from posixpath import join
         import os
 
         # Set up the Dropbox connection. Not sure how access_tokens will work
         access_token = os.environ.get('access_token')
         dropbox_dir = os.environ.get('dropbox_dir')
-        client = DropboxClient(access_token)
+        client = Dropbox(access_token)
 
         # If this is our first time with this file, set the program name and
         # location.
         self.program_location = join(
             dropbox_dir,
-            'programs',
+            program_location,
             self.program_name
         )
         # Retrieve the REST object from Dropbox
-        prog_obj = client.get_file(self.program_location)
+        prog_link = client.files_get_temporary_link(self.program_location)
+        response = requests.get(prog_link.link)
         # Put the program file contents into an array for parsing
-        program_content = prog_obj.readlines()
+        program_content = response.text
         # Send that stuff back.
         return program_content
 

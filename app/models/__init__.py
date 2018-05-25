@@ -12,8 +12,8 @@ DATA_FILES = [
     'Manifold',     #
     'flux',         #
     'ts_data',      #
-    'Table1Rain',   #
-    'unknown',      #
+    'Table1Rain',   #  
+    'unknown',      #  Removed on May 24, 2018 (folder does not exist on Dropbox)
 ]
 
 non_static_attrs = ['source', 'program', 'logger']
